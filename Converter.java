@@ -4,7 +4,7 @@ package tuomomees.screentimecalculator;
  * Created by tuomo on 30.5.2017.
  */
 
-public class converter {
+public class Converter {
 
     protected long convertMillisToMinutes(long millis)
     {

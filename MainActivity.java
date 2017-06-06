@@ -10,12 +10,18 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +30,15 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity{
+
+    ViewPager mViewPager;
+
+
+    AppStatsManager aStatsManager = new AppStatsManager();
+    Converter timeConverter = new Converter();
+    PermissionManager pManager = new PermissionManager();
+
 
     String[] apps;
 
@@ -66,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         //Alustaa tarvittavat widgetit
@@ -75,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         checkDisplayStats();
 
         //Piilottaa sovelluksen nimen
-        getSupportActionBar().hide();
+        //getSupportActionBar().hide();
 
         //Tekee notification barista läpinäkyvän
         Window w = getWindow(); // in Activity's onCreate() for instance
@@ -114,8 +129,11 @@ public class MainActivity extends AppCompatActivity {
         Log.d("Näytön koko on", height + "x" + width);
     }
 
+
+
     //Mikäli sovelluksella on tarvittavat oikeudet, hakee statistiikan. Muussa tapauksessa pyytää tarvittavia oikeuksia.
     private void fillStats() {
+
         if (hasPermission()){
             //Alustetaan aloitusarvot, jotta arvot eivät kertaudu
             setStartValues();
@@ -124,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
             requestPermission();
         }
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -149,9 +169,8 @@ public class MainActivity extends AppCompatActivity {
                     android.os.Process.myUid(), getPackageName());
         }
         return mode == AppOpsManager.MODE_ALLOWED;
-//        return ContextCompat.checkSelfPermission(this,
-//                Manifest.permission.PACKAGE_USAGE_STATS) == PackageManager.PERMISSION_GRANTED;
     }
+
 
     private void getStats() {
 
@@ -174,44 +193,45 @@ public class MainActivity extends AppCompatActivity {
         //Toimii ainoastaan Androidin versiolla 5.0 tai uudempi
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
 
+
+            long currentTime = System.currentTimeMillis();
+
+            Calendar calendar = Calendar.getInstance();
+            long endTime = calendar.getTimeInMillis();
+            long startTime = calendar.getTimeInMillis();
+            //endTime.add(Calendar.DAY_OF_MONTH, +1);
+
             //Poimii tiedot aina 24H sisällä, eli 24H liukuu jatkuvasti ns. mukana
             lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, System.currentTimeMillis()- TimeUnit.DAYS.toMillis(1),System.currentTimeMillis()+ TimeUnit.DAYS.toMillis(1));
+
+            //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_WEEKLY, 0, currentTime);
+
             Log.d("How many apps", String.valueOf(lUsageStatsList.size()));
             //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end); //86 399 000 millisekuntia on 23 tuntia ja 59 minuuttia ja 59 sekuntia
         }
 
-        TextView lTextView = (TextView) findViewById(R.id.textViewFirstTimeStamp);
-
-        StringBuilder lStringBuilder = new StringBuilder();
-
         for (UsageStats lUsageStats:lUsageStatsList){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-
-                checkDuplicateApps(getAppLabel(lUsageStats.getPackageName()), lUsageStats.getTotalTimeInForeground() );
+                checkDuplicateApps(aStatsManager.getAppLabel(lUsageStats.getPackageName(), getApplicationContext()), lUsageStats.getTotalTimeInForeground() );
 
                 //Mikäli appsia on käytetty enemmän kuin minuutti
                 if(((lUsageStats.getTotalTimeInForeground()/ 1000)/60) > 0 )
                 {
-                    //Haetaan paketin nimi
-                    //lStringBuilder.append(lUsageStats.getPackageName());
-                    //Haetaan Applikaation nimi paketin nimen avulla
-                    //lStringBuilder.append(getAppLabel(lUsageStats.getPackageName()));
-
                     //Tarkastaa TOP5 käytetyimmät appsit
-                    checkMostUsed(getAppLabel(lUsageStats.getPackageName()),lUsageStats.getPackageName(),lUsageStats.getTotalTimeInForeground());
+                    checkMostUsed(aStatsManager.getAppLabel(lUsageStats.getPackageName(), getApplicationContext()),lUsageStats.getPackageName(),lUsageStats.getTotalTimeInForeground());
 
                     //Tarkastaa yhteensä appsien käyttämän ajan
-                    calculateTotalTime(lUsageStats.getTotalTimeInForeground(), getAppLabel(lUsageStats.getPackageName()));
+                    calculateTotalTime(lUsageStats.getTotalTimeInForeground(), aStatsManager.getAppLabel(lUsageStats.getPackageName(), getApplicationContext()));
 
                     //Log.d("kaikki apsit", getAppLabel(lUsageStats.getPackageName()));
 
-                    //Haetaan applikaation käyttöaika ja muutetaan se minuuteiksi
-                    lStringBuilder.append((lUsageStats.getTotalTimeInForeground() / 1000)/60 + " min");
                     //lStringBuilder.append(lUsageStats.getLastTimeUsed());
 
                     totalUsage = totalUsage + lUsageStats.getTotalTimeInForeground();
-                    lStringBuilder.append("\r\n");
+
+                    String lastTimeUsed = aStatsManager.getAppLabel(lUsageStats.getPackageName()+ "  ", getApplicationContext()) + timeConverter.convertMillisToMinutes(lUsageStats.getLastTimeUsed());
+                    Log.d("LastTimeUsed", lastTimeUsed);
                 }
             }
         }
@@ -251,22 +271,6 @@ public class MainActivity extends AppCompatActivity {
 */
         counter++;
         return appName;
-    }
-
-    //Metodi, jolla paketin nimen avulla voi hakea applikaation labelin
-    protected String getAppLabel(String packageName)
-    {
-        String applicationName = null;
-        PackageManager packageManager = getApplicationContext().getPackageManager();
-
-        try {
-            applicationName = (String) packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA));
-
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return applicationName;
     }
 
     //Metodi, jolla lasketaan yhteen kaikki käyttöajat
@@ -402,11 +406,11 @@ public class MainActivity extends AppCompatActivity {
             //Log.d("top5 set: ", top5App);
         }
 
-        long top1Min = convertMillisToMinutes(top1);
-        long top2Min = convertMillisToMinutes(top2);
-        long top3Min = convertMillisToMinutes(top3);
-        long top4Min = convertMillisToMinutes(top4);
-        long top5Min = convertMillisToMinutes(top5);
+        long top1Min = timeConverter.convertMillisToMinutes(top1);
+        long top2Min = timeConverter.convertMillisToMinutes(top2);
+        long top3Min = timeConverter.convertMillisToMinutes(top3);
+        long top4Min = timeConverter.convertMillisToMinutes(top4);
+        long top5Min = timeConverter.convertMillisToMinutes(top5);
 
         top1StringBuilder.append("1. " + top1App + "\r\n" + top1Min + " min" + "\r\n");
         top2StringBuilder.append("2. " + top2App + "\r\n" + top2Min + " min" + "\r\n");
@@ -512,17 +516,11 @@ public class MainActivity extends AppCompatActivity {
         return appName;
     }
 
-    protected long convertMillisToMinutes(long millis)
-    {
-        long minutes = (millis / 1000) / 60;
-        return minutes;
-    }
-
     @Override
     protected void onDestroy()
     {
         //Lopettaa MainActivityn, kun se ei ole näkyvissä
-        finish();
+        //finish();
         super.onDestroy();
     }
 
@@ -534,4 +532,30 @@ public class MainActivity extends AppCompatActivity {
         fillStats();
         super.onResume();
     }
+
+    /*
+    //Metodi, jolla paketin nimen avulla voi hakea applikaation labelin
+    protected String getAppLabel(String packageName)
+    {
+        String applicationName = null;
+        PackageManager packageManager = getApplicationContext().getPackageManager();
+
+        try {
+            applicationName = (String) packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA));
+
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return applicationName;
+    }
+*/
+
+    /*
+    protected long convertMillisToMinutes(long millis)
+    {
+        long minutes = (millis / 1000) / 60;
+        return minutes;
+    }
+*/
 }

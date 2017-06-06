@@ -3,7 +3,7 @@ package tuomomees.screentimecalculator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class usageGraphActivity extends AppCompatActivity {
+public class UsageGraphActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

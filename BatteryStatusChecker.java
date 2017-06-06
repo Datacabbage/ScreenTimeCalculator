@@ -10,7 +10,7 @@ import android.os.BatteryManager;
  * Created by tuomo on 6.5.2017.
  */
 
-public class batteryStatusChecker extends BroadcastReceiver {
+public class BatteryStatusChecker extends BroadcastReceiver {
 
     Context context;
 
