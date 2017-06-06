@@ -26,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
-//asd
-
     String[] apps;
 
     List<String> appList = new ArrayList<>();
