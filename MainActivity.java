@@ -182,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
 
         TextView lTextView = (TextView) findViewById(R.id.textViewFirstTimeStamp);
 
-
         StringBuilder lStringBuilder = new StringBuilder();
 
         for (UsageStats lUsageStats:lUsageStatsList){
