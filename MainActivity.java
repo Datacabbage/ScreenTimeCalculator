@@ -101,8 +101,8 @@ public class MainActivity extends FragmentActivity{
         fillStats();
     }
 
-    public static class MyPagerAdapter extends FragmentPagerAdapter {
-        private static int NUM_ITEMS = 3;
+    public class MyPagerAdapter extends FragmentPagerAdapter {
+        private  int NUM_ITEMS = 3;
 
         public MyPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
@@ -129,10 +129,31 @@ public class MainActivity extends FragmentActivity{
             }
         }
 
-        // Returns the page title for the top indicator
+        //Metodi, jossa voi muuttaa sivun yläpalkin esittelytekstin (position palauttaa  sivunumeron 0-2)
         @Override
         public CharSequence getPageTitle(int position) {
-            return "Page " + position;
+
+
+
+
+
+            if(position == 0)
+            {
+                return getResources().getString(R.string.top5appspage_title);
+            }
+
+            if(position == 1)
+            {
+                return getResources().getString(R.string.lastusedpage_title);
+            }
+
+            if(position == 2)
+            {
+                return getResources().getString(R.string.top5appspage_title);
+            }
+
+
+            return "Page" + position;
         }
 
     }

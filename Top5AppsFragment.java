@@ -8,7 +8,10 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -72,6 +75,8 @@ public class Top5AppsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         //page = getArguments().getInt("someInt", 0);
         //title = getArguments().getString("someTitle");
+
+
     }
 
     // Inflate the view for the fragment based on layout XML
@@ -119,7 +124,8 @@ public class Top5AppsFragment extends Fragment {
         }
 
          //view = inflater.inflate(R.layout.fragment_top5apps, container, false);
-         //pagerHeader = (ViewPager) view.findViewById(R.id.vpPager);
+         //ViewPager pagerHeader = (ViewPager) view.findViewById(R.id.pager_header);
+
 
          //tvLabel.setText(page + " -- " + title);
 

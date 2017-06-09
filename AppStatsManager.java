@@ -33,7 +33,6 @@ public class AppStatsManager extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_about);
-
     }
 
     //Metodi, jolla paketin nimen avulla voi hakea applikaation labelin
@@ -50,8 +49,6 @@ public class AppStatsManager extends AppCompatActivity {
 
         return applicationName;
     }
-
-
 
     //TOP5 applikaatiot tsekataan tässä metodissa
     public long[] checkMostUsed(String appName, String packageName, long usageTime)
@@ -180,47 +177,6 @@ public class AppStatsManager extends AppCompatActivity {
         top3StringBuilder.append("3. " + top3App + "\r\n" + top3Min + " min" + "\r\n");
         top4StringBuilder.append("4. " + top4App + "\r\n" + top4Min + " min" + "\r\n");
         top5StringBuilder.append("5. " + top5App + "\r\n" + top5Min + " min" + "\r\n");
-
-        /*
-        Log.d("1 ", top1App + " " +top1Min);
-        Log.d("2 ", top2App + " " +top2Min);
-        Log.d("3 ", top3App + " " +top3Min);
-        Log.d("4 ", top4App + " " +top4Min);
-        Log.d("5 ", top5App + " " +top5Min);
-        */
-
-        /*
-        top1Text.setText(top1StringBuilder.toString());
-        top2Text.setText(top2StringBuilder.toString());
-        top3Text.setText(top3StringBuilder.toString());
-        top4Text.setText(top4StringBuilder.toString());
-        top5Text.setText(top5StringBuilder.toString());
-        */
-/*
-        //Asetetaan TOP5 appsien iconit näkymään, mikäli arvot eivät ole NULL
-        if(top1Package != null && top2Package != null && top3Package != null && top4Package != null && top5Package != null)
-        {
-            try {
-
-                Drawable icon1 = getPackageManager().getApplicationIcon(top1Package);
-                Drawable icon2 = getPackageManager().getApplicationIcon(top2Package);
-                Drawable icon3 = getPackageManager().getApplicationIcon(top3Package);
-                Drawable icon4 = getPackageManager().getApplicationIcon(top4Package);
-                Drawable icon5 = getPackageManager().getApplicationIcon(top5Package);
-
-                top1Icon.setImageDrawable(icon1);
-                top2Icon.setImageDrawable(icon2);
-                top3Icon.setImageDrawable(icon3);
-                top4Icon.setImageDrawable(icon4);
-                top5Icon.setImageDrawable(icon5);
-
-                //Log.d("Asetetaan ikonit", "OK");
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.d("EI TOIMI", "IKONIEN HAKU EI ONNISTU");
-                e.printStackTrace();
-            }
-        }
-        */
 
         return new long[] {top1, top2, top3, top4, top5};
     }
