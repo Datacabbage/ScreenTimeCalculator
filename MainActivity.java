@@ -5,23 +5,20 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,11 +74,16 @@ public class MainActivity extends FragmentActivity{
     //Alustetaan lista, johon tulee käyttötiedot
     List<UsageStats> lUsageStatsList;
 
+    MyPagerAdapter adapterViewPager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+
+        ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
+        adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
+        vpPager.setAdapter(adapterViewPager);
 
         //Alustaa tarvittavat widgetit
         initialize();
@@ -97,6 +99,73 @@ public class MainActivity extends FragmentActivity{
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         fillStats();
+    }
+
+    public static class MyPagerAdapter extends FragmentPagerAdapter {
+        private static int NUM_ITEMS = 3;
+
+        public MyPagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
+
+        // Returns total number of pages
+        @Override
+        public int getCount() {
+            return NUM_ITEMS;
+        }
+
+        // Returns the fragment to display for that page
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0: // Fragment # 0 - This will show FirstFragment
+                    return Top5AppsFragment.newInstance(0, "Top5 Apps");
+                case 1: // Fragment # 0 - This will show FirstFragment different title
+                    return LastTimeUsedFragment.newInstance(1, "Last Used");
+                case 2: // Fragment # 1 - This will show SecondFragment
+                    return Top5AppsFragment.newInstance(2, "Top5 Apps(3)");
+                default:
+                    return null;
+            }
+        }
+
+        // Returns the page title for the top indicator
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return "Page " + position;
+        }
+
+    }
+
+    //Metodi, jolla voidaan välittää tietoa fragmenttiin
+    private void passInfoToTop5Fragment(String info1, String info2, String info3, String info4, String info5)
+    {
+        //Lähetetään tiedot Fragmenttiin SharedPreferencen avulla
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("top5", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("top1AppInfo", info1);
+        editor.putString("top2AppInfo", info2);
+        editor.putString("top3AppInfo", info3);
+        editor.putString("top4AppInfo", info4);
+        editor.putString("top5AppInfo", info5);
+        //Lähetetään myös packagetiedot, jotta saadaan ikonit toimimaan
+        editor.putString("top1AppPackage", top1Package);
+        editor.putString("top2AppPackage", top2Package);
+        editor.putString("top3AppPackage", top3Package);
+        editor.putString("top4AppPackage", top4Package);
+        editor.putString("top5AppPackage", top5Package);
+        editor.apply();
+        editor.commit();
+
+/*
+        Top5AppsFragment top5AppsObj = new Top5AppsFragment();
+        Bundle data = new Bundle();
+        data.putString("top1AppInfo", info1);
+
+        Log.d("Passing to Fragment", info1);
+        top5AppsObj.setTop1Info(info1);
+        top5AppsObj.setArguments(data);
+        */
     }
 
     private void initialize() {
@@ -129,8 +198,6 @@ public class MainActivity extends FragmentActivity{
         Log.d("Näytön koko on", height + "x" + width);
     }
 
-
-
     //Mikäli sovelluksella on tarvittavat oikeudet, hakee statistiikan. Muussa tapauksessa pyytää tarvittavia oikeuksia.
     private void fillStats() {
 
@@ -142,8 +209,6 @@ public class MainActivity extends FragmentActivity{
             requestPermission();
         }
     }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -202,9 +267,9 @@ public class MainActivity extends FragmentActivity{
             //endTime.add(Calendar.DAY_OF_MONTH, +1);
 
             //Poimii tiedot aina 24H sisällä, eli 24H liukuu jatkuvasti ns. mukana
-            lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, System.currentTimeMillis()- TimeUnit.DAYS.toMillis(1),System.currentTimeMillis()+ TimeUnit.DAYS.toMillis(1));
+            //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, System.currentTimeMillis()- TimeUnit.DAYS.toMillis(1),System.currentTimeMillis()+ TimeUnit.DAYS.toMillis(1));
 
-            //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_WEEKLY, 0, currentTime);
+            lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, currentTime - TimeUnit.DAYS.toMillis(1), currentTime);
 
             Log.d("How many apps", String.valueOf(lUsageStatsList.size()));
             //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end); //86 399 000 millisekuntia on 23 tuntia ja 59 minuuttia ja 59 sekuntia
@@ -285,6 +350,7 @@ public class MainActivity extends FragmentActivity{
 
         totalUsageTimeMinutes = (totalUsageTimeMillis / 1000) / 60;
         totalTimeStringBuilder.append("Ruutuaika tänään: " + String.valueOf(totalUsageTimeMinutes) + " min");
+
         totalTimeText.setText(totalTimeStringBuilder.toString());
 
         return totalUsageTimeMinutes;
@@ -418,40 +484,16 @@ public class MainActivity extends FragmentActivity{
         top4StringBuilder.append("4. " + top4App + "\r\n" + top4Min + " min" + "\r\n");
         top5StringBuilder.append("5. " + top5App + "\r\n" + top5Min + " min" + "\r\n");
 
-        /*
-        Log.d("1 ", top1App + " " +top1Min);
-        Log.d("2 ", top2App + " " +top2Min);
-        Log.d("3 ", top3App + " " +top3Min);
-        Log.d("4 ", top4App + " " +top4Min);
-        Log.d("5 ", top5App + " " +top5Min);
-        */
+        String top1AppText, top2AppText, top3AppText, top4AppText, top5AppText;
 
-        top1Text.setText(top1StringBuilder.toString());
-        top2Text.setText(top2StringBuilder.toString());
-        top3Text.setText(top3StringBuilder.toString());
-        top4Text.setText(top4StringBuilder.toString());
-        top5Text.setText(top5StringBuilder.toString());
+        top1AppText = top1StringBuilder.toString();
+        top2AppText = top2StringBuilder.toString();
+        top3AppText = top3StringBuilder.toString();
+        top4AppText = top4StringBuilder.toString();
+        top5AppText = top5StringBuilder.toString();
 
-        //Asetetaan TOP5 appsien iconit näkymään, mikäli arvot eivät ole NULL
-        if(top1Package != null && top2Package != null && top3Package != null && top4Package != null && top5Package != null)
-        {
-            try {
-                Drawable icon1 = getPackageManager().getApplicationIcon(top1Package);
-                Drawable icon2 = getPackageManager().getApplicationIcon(top2Package);
-                Drawable icon3 = getPackageManager().getApplicationIcon(top3Package);
-                Drawable icon4 = getPackageManager().getApplicationIcon(top4Package);
-                Drawable icon5 = getPackageManager().getApplicationIcon(top5Package);
-                top1Icon.setImageDrawable(icon1);
-                top2Icon.setImageDrawable(icon2);
-                top3Icon.setImageDrawable(icon3);
-                top4Icon.setImageDrawable(icon4);
-                top5Icon.setImageDrawable(icon5);
-                //Log.d("Asetetaan ikonit", "OK");
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.d("EI TOIMI", "IKONIEN HAKU EI ONNISTU");
-                e.printStackTrace();
-            }
-        }
+        //Tällä metodilla voidaan toimittaa muuttujia kyseiseen Fragmenttiin
+        passInfoToTop5Fragment(top1AppText, top2AppText, top3AppText, top4AppText, top5AppText);
 
         return new long[] {top1, top2, top3, top4, top5};
     }
@@ -520,7 +562,7 @@ public class MainActivity extends FragmentActivity{
     protected void onDestroy()
     {
         //Lopettaa MainActivityn, kun se ei ole näkyvissä
-        //finish();
+        finish();
         super.onDestroy();
     }
 
@@ -532,30 +574,4 @@ public class MainActivity extends FragmentActivity{
         fillStats();
         super.onResume();
     }
-
-    /*
-    //Metodi, jolla paketin nimen avulla voi hakea applikaation labelin
-    protected String getAppLabel(String packageName)
-    {
-        String applicationName = null;
-        PackageManager packageManager = getApplicationContext().getPackageManager();
-
-        try {
-            applicationName = (String) packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA));
-
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return applicationName;
-    }
-*/
-
-    /*
-    protected long convertMillisToMinutes(long millis)
-    {
-        long minutes = (millis / 1000) / 60;
-        return minutes;
-    }
-*/
 }
