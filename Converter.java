@@ -1,14 +1,39 @@
 package tuomomees.screentimecalculator;
 
-/**
- * Created by tuomo on 30.5.2017.
- */
+import android.annotation.SuppressLint;
+import android.util.Log;
 
-public class Converter {
+import java.util.concurrent.TimeUnit;
 
-    protected long convertMillisToMinutes(long millis)
+
+class Converter {
+
+    long convertMillisToMinutes(long millis)
     {
-        long minutes = (millis / 1000) / 60;
-        return minutes;
+        return (millis / 1000) / 60;
+    }
+
+    String convertMillisToHoursMinutesSeconds(long millis)
+    {
+        Log.d("Muunnetaan", String.valueOf(millis));
+
+        @SuppressLint("DefaultLocale") String usageTime = String.format("%02d hour, %02d min, %02d sec",
+                TimeUnit.MILLISECONDS.toHours(millis),
+                TimeUnit.MILLISECONDS.toMinutes(millis) -
+                        TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+                TimeUnit.MILLISECONDS.toSeconds(millis) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+
+        Log.d("Muunnettu", usageTime);
+        return usageTime;
+    }
+
+    @SuppressLint("DefaultLocale")
+    protected String convertMillisToMinutesSeconds(long millis)
+    {
+        return String.format("%02d min, %02d sec",
+                TimeUnit.MILLISECONDS.toMinutes(millis),
+                TimeUnit.MILLISECONDS.toSeconds(millis) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
     }
 }

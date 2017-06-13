@@ -8,7 +8,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Process;
 import android.provider.Settings;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -101,10 +103,10 @@ public class MainActivity extends FragmentActivity{
         fillStats();
     }
 
-    public class MyPagerAdapter extends FragmentPagerAdapter {
+    private class MyPagerAdapter extends FragmentPagerAdapter {
         private  int NUM_ITEMS = 3;
 
-        public MyPagerAdapter(FragmentManager fragmentManager) {
+        MyPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
         }
 
@@ -132,10 +134,6 @@ public class MainActivity extends FragmentActivity{
         //Metodi, jossa voi muuttaa sivun yläpalkin esittelytekstin (position palauttaa  sivunumeron 0-2)
         @Override
         public CharSequence getPageTitle(int position) {
-
-
-
-
 
             if(position == 0)
             {
@@ -169,6 +167,9 @@ public class MainActivity extends FragmentActivity{
         editor.putString("top3AppInfo", info3);
         editor.putString("top4AppInfo", info4);
         editor.putString("top5AppInfo", info5);
+
+        editor.putString("totalUsage", (getResources().getString(R.string.totalusage_text) + timeConverter.convertMillisToHoursMinutesSeconds(totalUsageTimeMillis)));
+
         //Lähetetään myös packagetiedot, jotta saadaan ikonit toimimaan
         editor.putString("top1AppPackage", top1Package);
         editor.putString("top2AppPackage", top2Package);
@@ -176,17 +177,6 @@ public class MainActivity extends FragmentActivity{
         editor.putString("top4AppPackage", top4Package);
         editor.putString("top5AppPackage", top5Package);
         editor.apply();
-        editor.commit();
-
-/*
-        Top5AppsFragment top5AppsObj = new Top5AppsFragment();
-        Bundle data = new Bundle();
-        data.putString("top1AppInfo", info1);
-
-        Log.d("Passing to Fragment", info1);
-        top5AppsObj.setTop1Info(info1);
-        top5AppsObj.setArguments(data);
-        */
     }
 
     private void initialize() {
@@ -222,12 +212,14 @@ public class MainActivity extends FragmentActivity{
     //Mikäli sovelluksella on tarvittavat oikeudet, hakee statistiikan. Muussa tapauksessa pyytää tarvittavia oikeuksia.
     private void fillStats() {
 
-        if (hasPermission()){
-            //Alustetaan aloitusarvot, jotta arvot eivät kertaudu
-            setStartValues();
-            getStats();
-        }else{
-            requestPermission();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (hasPermission()){
+                //Alustetaan aloitusarvot, jotta arvot eivät kertaudu
+                setStartValues();
+                getStats();
+            }else{
+                requestPermission();
+            }
         }
     }
 
@@ -242,17 +234,26 @@ public class MainActivity extends FragmentActivity{
     }
 
     private void requestPermission() {
-        Toast.makeText(this, "Pyydetään tarvittavia oikeuksia.", Toast.LENGTH_SHORT).show();
-        startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS);
+        Toast.makeText(this, getResources().getString(R.string.permission_request), Toast.LENGTH_SHORT).show();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS);
+        }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private boolean hasPermission() {
-        AppOpsManager appOps = (AppOpsManager)
-                getSystemService(Context.APP_OPS_SERVICE);
+        AppOpsManager appOps = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            appOps = (AppOpsManager)
+                    getSystemService(Context.APP_OPS_SERVICE);
+        }
         int mode = 0;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
-                    android.os.Process.myUid(), getPackageName());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            assert appOps != null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                        Process.myUid(), getPackageName());
+            }
         }
         return mode == AppOpsManager.MODE_ALLOWED;
     }
@@ -274,7 +275,10 @@ public class MainActivity extends FragmentActivity{
         //Appsien kokonaiskäyttöaika
         long totalUsage = 0;
 
-        UsageStatsManager lUsageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
+        UsageStatsManager lUsageStatsManager = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
+            lUsageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
+        }
 
         //Toimii ainoastaan Androidin versiolla 5.0 tai uudempi
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -290,7 +294,9 @@ public class MainActivity extends FragmentActivity{
             //Poimii tiedot aina 24H sisällä, eli 24H liukuu jatkuvasti ns. mukana
             //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, System.currentTimeMillis()- TimeUnit.DAYS.toMillis(1),System.currentTimeMillis()+ TimeUnit.DAYS.toMillis(1));
 
-            lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, currentTime - TimeUnit.DAYS.toMillis(1), currentTime);
+            if (lUsageStatsManager != null) {
+                lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, currentTime - TimeUnit.DAYS.toMillis(1), currentTime);
+            }
 
             Log.d("How many apps", String.valueOf(lUsageStatsList.size()));
             //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end); //86 399 000 millisekuntia on 23 tuntia ja 59 minuuttia ja 59 sekuntia
@@ -364,15 +370,11 @@ public class MainActivity extends FragmentActivity{
     {
         //Log.d("Kokonaisaika on", String.valueOf(totalUsageTimeMillis));
         totalUsageTimeMillis = totalUsageTimeMillis + usageTime;
-
         //Log.d("Kokonaisaikaan lisätty", appName + " ajalla: " + usageTime);
 
-        StringBuilder totalTimeStringBuilder = new StringBuilder();
-
         totalUsageTimeMinutes = (totalUsageTimeMillis / 1000) / 60;
-        totalTimeStringBuilder.append("Ruutuaika tänään: " + String.valueOf(totalUsageTimeMinutes) + " min");
 
-        totalTimeText.setText(totalTimeStringBuilder.toString());
+        //totalTimeText.setText(totalTimeStringBuilder.toString());
 
         return totalUsageTimeMinutes;
     }
@@ -388,7 +390,7 @@ public class MainActivity extends FragmentActivity{
 
         //Tarkastetaan onko appi jo top5 listalla, jos on, niin nollataan
         //checkIfAppAlreadyExist(appName);
-        if(checkIfAppAlreadyExist(appName) == "null")
+        if(checkIfAppAlreadyExist(appName).equals("null"))
         {
             appName = "null";
             packageName = "null";
@@ -493,17 +495,25 @@ public class MainActivity extends FragmentActivity{
             //Log.d("top5 set: ", top5App);
         }
 
+        /*
         long top1Min = timeConverter.convertMillisToMinutes(top1);
         long top2Min = timeConverter.convertMillisToMinutes(top2);
         long top3Min = timeConverter.convertMillisToMinutes(top3);
         long top4Min = timeConverter.convertMillisToMinutes(top4);
         long top5Min = timeConverter.convertMillisToMinutes(top5);
+        */
 
-        top1StringBuilder.append("1. " + top1App + "\r\n" + top1Min + " min" + "\r\n");
-        top2StringBuilder.append("2. " + top2App + "\r\n" + top2Min + " min" + "\r\n");
-        top3StringBuilder.append("3. " + top3App + "\r\n" + top3Min + " min" + "\r\n");
-        top4StringBuilder.append("4. " + top4App + "\r\n" + top4Min + " min" + "\r\n");
-        top5StringBuilder.append("5. " + top5App + "\r\n" + top5Min + " min" + "\r\n");
+        String top1Min = timeConverter.convertMillisToHoursMinutesSeconds(top1);
+        String top2Min = timeConverter.convertMillisToHoursMinutesSeconds(top2);
+        String top3Min = timeConverter.convertMillisToHoursMinutesSeconds(top3);
+        String top4Min = timeConverter.convertMillisToHoursMinutesSeconds(top4);
+        String top5Min = timeConverter.convertMillisToHoursMinutesSeconds(top5);
+
+        top1StringBuilder.append("1. ").append(top1App).append("\r\n").append(top1Min).append("\r\n");
+        top2StringBuilder.append("2. ").append(top2App).append("\r\n").append(top2Min).append("\r\n");
+        top3StringBuilder.append("3. ").append(top3App).append("\r\n").append(top3Min).append("\r\n");
+        top4StringBuilder.append("4. ").append(top4App).append("\r\n").append(top4Min).append("\r\n");
+        top5StringBuilder.append("5. ").append(top5App).append("\r\n").append(top5Min).append("\r\n");
 
         String top1AppText, top2AppText, top3AppText, top4AppText, top5AppText;
 
@@ -543,14 +553,14 @@ public class MainActivity extends FragmentActivity{
         top5App = null;
 
         //Nollataan tekstikentät
-        top1Text.setText("haetaan tietoja...");
-        top2Text.setText("haetaan tietoja...");
-        top3Text.setText("haetaan tietoja...");
-        top4Text.setText("haetaan tietoja...");
-        top5Text.setText("haetaan tietoja...");
+        top1Text.setText(getResources().getString(R.string.totalusagerequest_text));
+        top2Text.setText(getResources().getString(R.string.totalusagerequest_text));
+        top3Text.setText(getResources().getString(R.string.totalusagerequest_text));
+        top4Text.setText(getResources().getString(R.string.totalusagerequest_text));
+        top5Text.setText(getResources().getString(R.string.totalusagerequest_text));
 
         //Nollataan kokonaisruutuaika tekstikenttä
-        totalTimeText.setText("haetaan tietoja...");
+        totalTimeText.setText(getResources().getString(R.string.totalusagerequest_text));
 
         //Nollataan kokonaisruutuaika
         totalUsageTimeMinutes = 0;
@@ -569,11 +579,6 @@ public class MainActivity extends FragmentActivity{
         {
             Log.d("Toistamiseen", appName);
             appName = "null";
-        }
-
-        else
-        {
-            //Do nothing
         }
 
         return appName;

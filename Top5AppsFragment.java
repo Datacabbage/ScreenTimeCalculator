@@ -22,9 +22,6 @@ import android.widget.TextView;
 
 import static android.content.Context.MODE_PRIVATE;
 
-/**
- * Created by tuomo on 6.6.2017.
- */
 
 public class Top5AppsFragment extends Fragment {
 
@@ -67,16 +64,16 @@ public class Top5AppsFragment extends Fragment {
     Drawable icon4 = null;
     Drawable icon5 = null;
 
+    //Kokonaiskäyttöaika
+    String totalUsage = null;
+    TextView totalUsageTimeText;
+
     View view;
 
     // Store instance variables based on arguments passed
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //page = getArguments().getInt("someInt", 0);
-        //title = getArguments().getString("someTitle");
-
-
     }
 
     // Inflate the view for the fragment based on layout XML
@@ -92,6 +89,25 @@ public class Top5AppsFragment extends Fragment {
         //Haetaan tarvittavat jaetut tiedot (paketin nimi ja app -info)
         getSharedPreferences();
 
+        //Asetetaan käyttöajat näkyviin textvieweihin
+        setTextViewTexts();
+
+        //Asetetaan sovellusten kuvakkeet näkyviin imagevieweihin
+        setIconDrawable();
+
+        return view;
+        //return inflater.inflate(R.layout.fragment_top5apps, container, false);
+    }
+
+    //Metodi, jolla asetetaan textvieweihin tekstit
+    protected void setTextViewTexts()
+    {
+        //Asetetaan kokonaiskäyttöaika, mikäli se ei ole tyhjä
+        if(totalUsage != null)
+        {
+            totalUsageTimeText.setText(totalUsage);
+        }
+
         //Asetetaan tekstit, mikäli ne eivät ole tyhjiä
         if(!top1AppInfo.equalsIgnoreCase("") && !top2AppInfo.equalsIgnoreCase("") && !top3AppInfo.equalsIgnoreCase("") && !top4AppInfo.equalsIgnoreCase("") && !top5AppInfo.equalsIgnoreCase(""))
         {
@@ -102,7 +118,11 @@ public class Top5AppsFragment extends Fragment {
             top5AppText.setText(top5AppInfo);
             Log.d("Tekstit asetettu", "top5");
         }
+    }
 
+    //Metodi, jolla asetetaan drawable -muotoiset iconit näkyviin imagevieweihin
+    protected void setIconDrawable()
+    {
         //Asetetaan TOP5 appsien iconit näkymään, mikäli arvot eivät ole NULL
         if(top1Package != null && top2Package != null && top3Package != null && top4Package != null && top5Package != null)
         {
@@ -123,14 +143,6 @@ public class Top5AppsFragment extends Fragment {
             }
         }
 
-         //view = inflater.inflate(R.layout.fragment_top5apps, container, false);
-         //ViewPager pagerHeader = (ViewPager) view.findViewById(R.id.pager_header);
-
-
-         //tvLabel.setText(page + " -- " + title);
-
-        return view;
-        //return inflater.inflate(R.layout.fragment_top5apps, container, false);
     }
 
     //Metodi, jolla alustetaan tarvittavat widgetit
@@ -142,6 +154,7 @@ public class Top5AppsFragment extends Fragment {
         top3AppText= (TextView) view.findViewById(R.id.top3App);
         top4AppText= (TextView) view.findViewById(R.id.top4App);
         top5AppText= (TextView) view.findViewById(R.id.top5App);
+        totalUsageTimeText = (TextView) view.findViewById(R.id.textViewTotalTime);
 
         //Alustetaan ImageViewit
         top1Icon = (ImageView) view.findViewById(R.id.imageViewTop1);
@@ -168,6 +181,11 @@ public class Top5AppsFragment extends Fragment {
         top3Package = pref.getString("top3AppPackage", null);
         top4Package = pref.getString("top4AppPackage", null);
         top5Package = pref.getString("top5AppPackage", null);
+
+        //Haetaan kokonaiskäyttöaika
+        totalUsage = pref.getString("totalUsage", null);
+
+        //Log.d("totalUsage", totalUsage);
 
         /*
         Log.d("top1", top1Package);
