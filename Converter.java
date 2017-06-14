@@ -15,8 +15,9 @@ class Converter {
 
     String convertMillisToHoursMinutesSeconds(long millis)
     {
-        Log.d("Muunnetaan", String.valueOf(millis));
+        //Log.d("Muunnetaan", String.valueOf(millis));
 
+        //@SuppressLint("DefaultLocale") String usageTime = String.format("%02d hour, %02d min, %02d sec",
         @SuppressLint("DefaultLocale") String usageTime = String.format("%02d hour, %02d min, %02d sec",
                 TimeUnit.MILLISECONDS.toHours(millis),
                 TimeUnit.MILLISECONDS.toMinutes(millis) -
@@ -24,7 +25,7 @@ class Converter {
                 TimeUnit.MILLISECONDS.toSeconds(millis) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
 
-        Log.d("Muunnettu", usageTime);
+        //Log.d("Muunnettu", usageTime);
         return usageTime;
     }
 

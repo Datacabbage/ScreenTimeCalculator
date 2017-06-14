@@ -1,18 +1,11 @@
 package tuomomees.screentimecalculator;
 
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,15 +66,25 @@ public class Top5AppsFragment extends Fragment {
     // Store instance variables based on arguments passed
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+        Log.d("Fragment", "onCreate");
     }
 
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+    }
     // Inflate the view for the fragment based on layout XML
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_top5apps, container, false);
+
+        Log.d("Fragment", "onCreateView");
 
         //Alustetaan widgetit
         initialize();
@@ -142,7 +145,6 @@ public class Top5AppsFragment extends Fragment {
                 Log.d("Asetetaan ikonit", "OK");
             }
         }
-
     }
 
     //Metodi, jolla alustetaan tarvittavat widgetit
@@ -219,5 +221,15 @@ public class Top5AppsFragment extends Fragment {
         args.putString("someTitle", title);
         top5AppsObj.setArguments(args);
         return top5AppsObj;
+    }
+
+    protected void setStartValues()
+    {
+        //Nollataan tekstikentät
+        top1AppText.setText(getResources().getString(R.string.totalusagerequest_text));
+        top2AppText.setText(getResources().getString(R.string.totalusagerequest_text));
+        top3AppText.setText(getResources().getString(R.string.totalusagerequest_text));
+        top4AppText.setText(getResources().getString(R.string.totalusagerequest_text));
+        top5AppText.setText(getResources().getString(R.string.totalusagerequest_text));
     }
 }

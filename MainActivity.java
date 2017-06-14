@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Process;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
@@ -15,7 +16,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Window;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 
 public class MainActivity extends FragmentActivity{
 
@@ -78,10 +82,14 @@ public class MainActivity extends FragmentActivity{
 
     MyPagerAdapter adapterViewPager;
 
+    SwipeRefreshLayout swipeLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        initializeSwipeRefresh();
 
         ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
@@ -101,6 +109,26 @@ public class MainActivity extends FragmentActivity{
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         fillStats();
+    }
+
+    protected void initializeSwipeRefresh()
+    {
+        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+
+        swipeLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        Log.d("SwipeRefresh", "Päivitys aloitettu");
+
+                        // This method performs the actual data-refresh operation.
+                        // The method calls setRefreshing(false) when it's finished.
+                        fillStats();
+                        refreshFragment("top5fragment");
+                        swipeLayout.setRefreshing(false);
+                    }
+                }
+        );
     }
 
     private class MyPagerAdapter extends FragmentPagerAdapter {
@@ -149,7 +177,6 @@ public class MainActivity extends FragmentActivity{
             {
                 return getResources().getString(R.string.top5appspage_title);
             }
-
 
             return "Page" + position;
         }
@@ -321,13 +348,9 @@ public class MainActivity extends FragmentActivity{
                     //lStringBuilder.append(lUsageStats.getLastTimeUsed());
 
                     totalUsage = totalUsage + lUsageStats.getTotalTimeInForeground();
-
-                    String lastTimeUsed = aStatsManager.getAppLabel(lUsageStats.getPackageName()+ "  ", getApplicationContext()) + timeConverter.convertMillisToMinutes(lUsageStats.getLastTimeUsed());
-                    Log.d("LastTimeUsed", lastTimeUsed);
                 }
             }
         }
-
 
         long totalUsageSec = totalUsage / 1000;
         long totalUsageMin = totalUsageSec / 60;
@@ -338,7 +361,6 @@ public class MainActivity extends FragmentActivity{
     //Tarkistaa onko sama applikaatio esiintynyt useamman kerran
     protected String checkDuplicateApps(String appName, long usageTime)
     {
-
 /*
         final ArrayList appArray = new ArrayList(lUsageStatsList.size());
         appArray.add(counter, appName);
@@ -373,8 +395,6 @@ public class MainActivity extends FragmentActivity{
         //Log.d("Kokonaisaikaan lisätty", appName + " ajalla: " + usageTime);
 
         totalUsageTimeMinutes = (totalUsageTimeMillis / 1000) / 60;
-
-        //totalTimeText.setText(totalTimeStringBuilder.toString());
 
         return totalUsageTimeMinutes;
     }
@@ -599,5 +619,21 @@ public class MainActivity extends FragmentActivity{
         //Haetaan arvot uudelleen
         fillStats();
         super.onResume();
+    }
+
+    //Metodi, jolla voi uudelleenkäynnistää fragmentin
+    protected void refreshFragment(String fragmentTag)
+    {
+        Top5AppsFragment top5AppsFragment= new Top5AppsFragment();
+
+        // Begin the transaction
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+        ft.detach(top5AppsFragment);
+        ft.attach(top5AppsFragment);
+        // Replace the contents of the container with the new fragment
+        //ft.replace(R.id.fragment_top5apps, new Top5AppsFragment());
+        // Complete the changes added above
+        ft.commit();
     }
 }
