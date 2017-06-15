@@ -36,7 +36,6 @@ public class MainActivity extends FragmentActivity{
 
     AppStatsManager aStatsManager = new AppStatsManager();
     Converter timeConverter = new Converter();
-    PermissionManager pManager;
 
     String[] apps;
 
@@ -173,7 +172,6 @@ public class MainActivity extends FragmentActivity{
 
             return "Page" + position;
         }
-
     }
 
     //Metodi, jolla voidaan välittää tietoa fragmenttiin
@@ -188,7 +186,7 @@ public class MainActivity extends FragmentActivity{
         editor.putString("top4AppInfo", info4);
         editor.putString("top5AppInfo", info5);
 
-        editor.putString("totalUsage", (getResources().getString(R.string.totalusage_text) + timeConverter.convertMillisToHoursMinutesSeconds(totalUsageTimeMillis)));
+        editor.putString("totalUsage", (getResources().getString(R.string.totalusage_text) + "\r\n" +timeConverter.convertMillisToHoursMinutesSeconds(totalUsageTimeMillis)));
 
         //Lähetetään myös packagetiedot, jotta saadaan ikonit toimimaan
         editor.putString("top1AppPackage", top1Package);
@@ -303,6 +301,10 @@ public class MainActivity extends FragmentActivity{
 
             long currentTime = System.currentTimeMillis();
 
+            //Calendar for query
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DAY_OF_WEEK, -1);
+
             Calendar calendar = Calendar.getInstance();
             long endTime = calendar.getTimeInMillis();
             long startTime = calendar.getTimeInMillis();
@@ -312,7 +314,7 @@ public class MainActivity extends FragmentActivity{
             //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, System.currentTimeMillis()- TimeUnit.DAYS.toMillis(1),System.currentTimeMillis()+ TimeUnit.DAYS.toMillis(1));
 
             if (lUsageStatsManager != null) {
-                lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, currentTime - TimeUnit.DAYS.toMillis(1), currentTime);
+                lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, cal.getTimeInMillis(), System.currentTimeMillis());
             }
 
             Log.d("How many apps", String.valueOf(lUsageStatsList.size()));
@@ -504,17 +506,23 @@ public class MainActivity extends FragmentActivity{
             //Log.d("top5 set: ", top5App);
         }
 
-        String top1Min = timeConverter.convertMillisToHoursMinutesSeconds(top1);
-        String top2Min = timeConverter.convertMillisToHoursMinutesSeconds(top2);
-        String top3Min = timeConverter.convertMillisToHoursMinutesSeconds(top3);
-        String top4Min = timeConverter.convertMillisToHoursMinutesSeconds(top4);
-        String top5Min = timeConverter.convertMillisToHoursMinutesSeconds(top5);
+        Log.d("top1", top1App + " " + timeConverter.convertMillisToHoursMinutesSeconds(top1));
+        Log.d("top2", top2App + " " + timeConverter.convertMillisToHoursMinutesSeconds(top2));
+        Log.d("top3", top3App + " " + timeConverter.convertMillisToHoursMinutesSeconds(top3));
+        Log.d("top4", top4App + " " + timeConverter.convertMillisToHoursMinutesSeconds(top4));
+        Log.d("top5", top5App + " " + timeConverter.convertMillisToHoursMinutesSeconds(top5));
 
-        top1StringBuilder.append("1. ").append(top1App).append("\r\n").append(top1Min).append("\r\n");
-        top2StringBuilder.append("2. ").append(top2App).append("\r\n").append(top2Min).append("\r\n");
-        top3StringBuilder.append("3. ").append(top3App).append("\r\n").append(top3Min).append("\r\n");
-        top4StringBuilder.append("4. ").append(top4App).append("\r\n").append(top4Min).append("\r\n");
-        top5StringBuilder.append("5. ").append(top5App).append("\r\n").append(top5Min).append("\r\n");
+        String top1Time = timeConverter.convertMillisToHoursMinutesSeconds(top1);
+        String top2Time = timeConverter.convertMillisToHoursMinutesSeconds(top2);
+        String top3Time = timeConverter.convertMillisToHoursMinutesSeconds(top3);
+        String top4Time = timeConverter.convertMillisToHoursMinutesSeconds(top4);
+        String top5Time = timeConverter.convertMillisToHoursMinutesSeconds(top5);
+
+        top1StringBuilder.append("1. ").append(top1App).append("\r\n").append(top1Time).append("\r\n");
+        top2StringBuilder.append("2. ").append(top2App).append("\r\n").append(top2Time).append("\r\n");
+        top3StringBuilder.append("3. ").append(top3App).append("\r\n").append(top3Time).append("\r\n");
+        top4StringBuilder.append("4. ").append(top4App).append("\r\n").append(top4Time).append("\r\n");
+        top5StringBuilder.append("5. ").append(top5App).append("\r\n").append(top5Time).append("\r\n");
 
         String top1AppText, top2AppText, top3AppText, top4AppText, top5AppText;
 
@@ -588,12 +596,12 @@ public class MainActivity extends FragmentActivity{
     @Override
     protected void onDestroy()
     {
-        Top5AppsFragment top5AppsFragment= new Top5AppsFragment();
+        //Top5AppsFragment top5AppsFragment= new Top5AppsFragment();
 
         // Begin the transaction
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.detach(top5AppsFragment);
-        ft.commit();
+        //FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        //ft.detach(top5AppsFragment);
+        //ft.commit();
 
         //Lopettaa MainActivityn, kun se ei ole näkyvissä
         finish();
@@ -615,13 +623,21 @@ public class MainActivity extends FragmentActivity{
         Top5AppsFragment top5AppsFragment= new Top5AppsFragment();
 
         // Begin the transaction
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        //FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-        ft.detach(top5AppsFragment);
-        ft.attach(top5AppsFragment);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .detach(top5AppsFragment)
+                .attach(top5AppsFragment)
+                .commit();
+
+
+
+        //ft.detach(top5AppsFragment);
+        //ft.attach(top5AppsFragment);
         // Replace the contents of the container with the new fragment
         //ft.replace(R.id.fragment_top5apps, new Top5AppsFragment());
         // Complete the changes added above
-        ft.commit();
+        //ft.commit();
     }
 }

@@ -58,7 +58,7 @@ public class Top5AppsFragment extends Fragment {
     public void onDestroy()
     {
         super.onDestroy();
-        getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+        //getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
     }
 
     // Inflate the view for the fragment based on layout XML
@@ -72,6 +72,9 @@ public class Top5AppsFragment extends Fragment {
 
         //Alustetaan widgetit
         initialize();
+
+        //Nollataan arvot
+        setStartValues();
 
         //Haetaan tarvittavat jaetut tiedot (paketin nimi ja app -info)
         getSharedPreferences();
@@ -89,57 +92,98 @@ public class Top5AppsFragment extends Fragment {
     //Metodi, jolla asetetaan textvieweihin tekstit
     protected void setTextViewTexts()
     {
+        //Nollataan tekstikentät, mikäli tekstien haku epäonnistuu
+        top1AppText.setText(getResources().getString(R.string.totalusagerequest_text));
+        top2AppText.setText(getResources().getString(R.string.totalusagerequest_text));
+        top3AppText.setText(getResources().getString(R.string.totalusagerequest_text));
+        top4AppText.setText(getResources().getString(R.string.totalusagerequest_text));
+        top5AppText.setText(getResources().getString(R.string.totalusagerequest_text));
+
         //Asetetaan kokonaiskäyttöaika, mikäli se ei ole tyhjä
         if(totalUsage != null)
-        {
-            totalUsageTimeText.setText(totalUsage);
-        }
+        {totalUsageTimeText.setText(totalUsage);}
 
-        //Asetetaan tekstit, mikäli ne eivät ole tyhjiä
-        if(!top1AppInfo.equalsIgnoreCase("") && !top2AppInfo.equalsIgnoreCase("") && !top3AppInfo.equalsIgnoreCase("") && !top4AppInfo.equalsIgnoreCase("") && !top5AppInfo.equalsIgnoreCase(""))
-        {
-            top1AppText.setText(top1AppInfo);
-            top2AppText.setText(top2AppInfo);
-            top3AppText.setText(top3AppInfo);
-            top4AppText.setText(top4AppInfo);
-            top5AppText.setText(top5AppInfo);
-            Log.d("Tekstit asetettu", "top5");
-        }
+        if(!top1AppInfo.equalsIgnoreCase(null))
+        {top1AppText.setText(top1AppInfo);}
+
+        if(!top2AppInfo.equalsIgnoreCase(null))
+        {top2AppText.setText(top2AppInfo);}
+
+        if(!top3AppInfo.equalsIgnoreCase(null))
+        {top3AppText.setText(top3AppInfo);}
+
+        if(!top4AppInfo.equalsIgnoreCase(null))
+        {top4AppText.setText(top4AppInfo);}
+
+        if(!top5AppInfo.equalsIgnoreCase(null))
+        {top5AppText.setText(top5AppInfo);}
+
+        Log.d("Tekstit asetettu", "top5");
     }
 
     //Metodi, jolla asetetaan drawable -muotoiset iconit näkyviin imagevieweihin
     protected void setIconDrawable()
     {
+        //Asetetaan ikoneiksi perusikoni, mikäli ikonien haku epäonnistuu
+        top1Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
+        top2Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
+        top3Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
+        top4Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
+        top5Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
+
         //Asetetaan TOP5 appsien iconit näkymään, mikäli arvot eivät ole NULL
-        if(top1Package != null && top2Package != null && top3Package != null && top4Package != null && top5Package != null)
+        if(top1Package != null)
         {
             icon1 = getIconDrawable(top1Package);
+
+            if(icon1 != null)
+            {top1Icon.setImageDrawable(icon1);}
+        }
+
+        if(top2Package != null)
+        {
             icon2 = getIconDrawable(top2Package);
+
+            if(icon2 != null)
+            {top2Icon.setImageDrawable(icon2);}
+        }
+
+        if(top3Package != null)
+        {
             icon3 = getIconDrawable(top3Package);
+
+            if(icon3 != null)
+            {top3Icon.setImageDrawable(icon3);}
+        }
+
+        if(top4Package != null)
+        {
             icon4 = getIconDrawable(top4Package);
+
+            if(icon4 != null)
+            {top4Icon.setImageDrawable(icon4);}
+        }
+
+        if(top5Package != null)
+        {
             icon5 = getIconDrawable(top5Package);
 
-            if(icon1 != null && icon2 != null && icon3 != null && icon4 != null && icon5 != null)
-            {
-                top1Icon.setImageDrawable(icon1);
-                top2Icon.setImageDrawable(icon2);
-                top3Icon.setImageDrawable(icon3);
-                top4Icon.setImageDrawable(icon4);
-                top5Icon.setImageDrawable(icon5);
-                Log.d("Asetetaan ikonit", "OK");
-            }
+            if(icon5 != null)
+            {top5Icon.setImageDrawable(icon5);}
         }
+
+        Log.d("Asetetaan ikonit", "OK");
     }
 
     //Metodi, jolla alustetaan tarvittavat widgetit
     protected void initialize()
     {
         //Alustetaan TextViewit
-        top1AppText= (TextView) view.findViewById(R.id.top1App);
-        top2AppText= (TextView) view.findViewById(R.id.top2App);
-        top3AppText= (TextView) view.findViewById(R.id.top3App);
-        top4AppText= (TextView) view.findViewById(R.id.top4App);
-        top5AppText= (TextView) view.findViewById(R.id.top5App);
+        top1AppText = (TextView) view.findViewById(R.id.top1App);
+        top2AppText = (TextView) view.findViewById(R.id.top2App);
+        top3AppText = (TextView) view.findViewById(R.id.top3App);
+        top4AppText = (TextView) view.findViewById(R.id.top4App);
+        top5AppText = (TextView) view.findViewById(R.id.top5App);
         totalUsageTimeText = (TextView) view.findViewById(R.id.textViewTotalTime);
 
         //Alustetaan ImageViewit
@@ -215,11 +259,34 @@ public class Top5AppsFragment extends Fragment {
 
     protected void setStartValues()
     {
+        Log.d("Fragment", "Nollataan statsit");
+
         //Nollataan tekstikentät
         top1AppText.setText(getResources().getString(R.string.totalusagerequest_text));
         top2AppText.setText(getResources().getString(R.string.totalusagerequest_text));
         top3AppText.setText(getResources().getString(R.string.totalusagerequest_text));
         top4AppText.setText(getResources().getString(R.string.totalusagerequest_text));
         top5AppText.setText(getResources().getString(R.string.totalusagerequest_text));
+
+        //Nollataan stringsit
+        top1AppInfo = null;
+        top2AppInfo = null;
+        top3AppInfo = null;
+        top4AppInfo = null;
+        top5AppInfo = null;
+
+        top1Package = null;
+        top2Package = null;
+        top3Package = null;
+        top4Package = null;
+        top5Package = null;
+
+        icon1 = null;
+        icon2 = null;
+        icon3 = null;
+        icon4 = null;
+        icon5 = null;
+
+        Log.d("Muuttujat nollattu", "OK");
     }
 }
