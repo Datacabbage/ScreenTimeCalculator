@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Process;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
@@ -27,7 +26,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -35,19 +33,14 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends FragmentActivity{
 
-    ViewPager mViewPager;
-
 
     AppStatsManager aStatsManager = new AppStatsManager();
     Converter timeConverter = new Converter();
-    PermissionManager pManager = new PermissionManager();
-
+    PermissionManager pManager;
 
     String[] apps;
 
-    List<String> appList = new ArrayList<>();
     int counter = 0;
-    int duplicateCounter = 0;
 
     private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 100;
 
@@ -65,8 +58,7 @@ public class MainActivity extends FragmentActivity{
     long totalUsageTimeMinutes = 0;
 
     //Alustetaan näytön koon muuttujat, jotta niitä voidaan käyttää globaalisti
-    int height = 0;
-    int width = 0;
+    int height, width;
 
     //Muuttujat, joihin alustetaan top5 käytetyt appsit
     long top1, top2, top3, top4, top5;
@@ -111,6 +103,7 @@ public class MainActivity extends FragmentActivity{
         fillStats();
     }
 
+    //Metodi, joka alustaa käyttöön SwipeRefreshin
     protected void initializeSwipeRefresh()
     {
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
@@ -238,7 +231,6 @@ public class MainActivity extends FragmentActivity{
 
     //Mikäli sovelluksella on tarvittavat oikeudet, hakee statistiikan. Muussa tapauksessa pyytää tarvittavia oikeuksia.
     private void fillStats() {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             if (hasPermission()){
                 //Alustetaan aloitusarvot, jotta arvot eivät kertaudu
@@ -255,7 +247,7 @@ public class MainActivity extends FragmentActivity{
         Log.d("MainActivity", "resultCode " + resultCode);
         switch (requestCode){
             case MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS:
-                fillStats();
+                //fillStats();
                 break;
         }
     }
@@ -285,7 +277,6 @@ public class MainActivity extends FragmentActivity{
         return mode == AppOpsManager.MODE_ALLOWED;
     }
 
-
     private void getStats() {
 
         //Alla olevilla laineilla haetaan aikatiedot
@@ -309,7 +300,6 @@ public class MainActivity extends FragmentActivity{
 
         //Toimii ainoastaan Androidin versiolla 5.0 tai uudempi
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-
 
             long currentTime = System.currentTimeMillis();
 
@@ -409,7 +399,6 @@ public class MainActivity extends FragmentActivity{
         StringBuilder top5StringBuilder = new StringBuilder();
 
         //Tarkastetaan onko appi jo top5 listalla, jos on, niin nollataan
-        //checkIfAppAlreadyExist(appName);
         if(checkIfAppAlreadyExist(appName).equals("null"))
         {
             appName = "null";
@@ -515,14 +504,6 @@ public class MainActivity extends FragmentActivity{
             //Log.d("top5 set: ", top5App);
         }
 
-        /*
-        long top1Min = timeConverter.convertMillisToMinutes(top1);
-        long top2Min = timeConverter.convertMillisToMinutes(top2);
-        long top3Min = timeConverter.convertMillisToMinutes(top3);
-        long top4Min = timeConverter.convertMillisToMinutes(top4);
-        long top5Min = timeConverter.convertMillisToMinutes(top5);
-        */
-
         String top1Min = timeConverter.convertMillisToHoursMinutesSeconds(top1);
         String top2Min = timeConverter.convertMillisToHoursMinutesSeconds(top2);
         String top3Min = timeConverter.convertMillisToHoursMinutesSeconds(top3);
@@ -607,6 +588,13 @@ public class MainActivity extends FragmentActivity{
     @Override
     protected void onDestroy()
     {
+        Top5AppsFragment top5AppsFragment= new Top5AppsFragment();
+
+        // Begin the transaction
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.detach(top5AppsFragment);
+        ft.commit();
+
         //Lopettaa MainActivityn, kun se ei ole näkyvissä
         finish();
         super.onDestroy();

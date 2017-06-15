@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
- * Created by tuomo on 7.6.2017.
+ * Luokan on luonut tuomo päivämäärällä 7.6.2017.
  */
 
 public class LastTimeUsedFragment extends Fragment {
@@ -46,9 +46,6 @@ public class LastTimeUsedFragment extends Fragment {
         //fragmentFirst.setArguments(args);
         return fragmentFirst;
     }
-
-
-
 
     /*
     @Override

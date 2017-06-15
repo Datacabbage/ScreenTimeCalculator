@@ -9,7 +9,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 /**
- * Created by tuomo on 6.6.2017.
+ * Luokan on luonut tuomo päivämäärällä 6.6.2017.
  */
 
 public class AppStatsManager extends AppCompatActivity {
@@ -61,7 +61,7 @@ public class AppStatsManager extends AppCompatActivity {
 
         //Tarkastetaan onko appi jo top5 listalla, jos on, niin nollataan
         //checkIfAppAlreadyExist(appName);
-        if(checkIfAppAlreadyExist(appName) == "null")
+        if(checkIfAppAlreadyExist(appName).equals("null"))
         {
             appName = "null";
             packageName = "null";
@@ -166,17 +166,21 @@ public class AppStatsManager extends AppCompatActivity {
             //Log.d("top5 set: ", top5App);
         }
 
-        long top1Min = convertMillisToMinutes(top1);
-        long top2Min = convertMillisToMinutes(top2);
-        long top3Min = convertMillisToMinutes(top3);
-        long top4Min = convertMillisToMinutes(top4);
-        long top5Min = convertMillisToMinutes(top5);
+        Converter converter = null;
 
-        top1StringBuilder.append("1. " + top1App + "\r\n" + top1Min + " min" + "\r\n");
-        top2StringBuilder.append("2. " + top2App + "\r\n" + top2Min + " min" + "\r\n");
-        top3StringBuilder.append("3. " + top3App + "\r\n" + top3Min + " min" + "\r\n");
-        top4StringBuilder.append("4. " + top4App + "\r\n" + top4Min + " min" + "\r\n");
-        top5StringBuilder.append("5. " + top5App + "\r\n" + top5Min + " min" + "\r\n");
+
+        String top1Min = converter.convertMillisToHoursMinutesSeconds(top1);
+        String top2Min = converter.convertMillisToHoursMinutesSeconds(top2);
+        String top3Min = converter.convertMillisToHoursMinutesSeconds(top3);
+        String top4Min = converter.convertMillisToHoursMinutesSeconds(top4);
+        String top5Min = converter.convertMillisToHoursMinutesSeconds(top5);
+
+
+        top1StringBuilder.append("1. ").append(top1App).append("\r\n").append(top1Min).append(" min").append("\r\n");
+        top2StringBuilder.append("2. ").append(top2App).append("\r\n").append(top2Min).append(" min").append("\r\n");
+        top3StringBuilder.append("3. ").append(top3App).append("\r\n").append(top3Min).append(" min").append("\r\n");
+        top4StringBuilder.append("4. ").append(top4App).append("\r\n").append(top4Min).append(" min").append("\r\n");
+        top5StringBuilder.append("5. ").append(top5App).append("\r\n").append(top5Min).append(" min").append("\r\n");
 
         return new long[] {top1, top2, top3, top4, top5};
     }
@@ -192,19 +196,7 @@ public class AppStatsManager extends AppCompatActivity {
             appName = "null";
         }
 
-        else
-        {
-            //Do nothing
-        }
-
         return appName;
     }
-
-    protected long convertMillisToMinutes(long millis)
-    {
-        long minutes = (millis / 1000) / 60;
-        return minutes;
-    }
-
 
 }

@@ -23,32 +23,16 @@ public class Top5AppsFragment extends Fragment {
     private int page;
 
     //TextViewit, joihin asetetaan näkyviin top5 applikaatioiden infot
-    TextView top1AppText;
-    TextView top2AppText;
-    TextView top3AppText;
-    TextView top4AppText;
-    TextView top5AppText;
+    TextView top1AppText, top2AppText, top3AppText, top4AppText, top5AppText;
 
     //ImageViewit, joihin asetetaan näkyviin applikaatioiden ikonit
-    ImageView top1Icon;
-    ImageView top2Icon;
-    ImageView top3Icon;
-    ImageView top4Icon;
-    ImageView top5Icon;
+    ImageView top1Icon, top2Icon, top3Icon, top4Icon, top5Icon;
 
     //Muuttujat, jotka sisältävät Applikaation nimen, top5 numeron ja käyttöajan
-    public String top1AppInfo;
-    public String top2AppInfo;
-    public String top3AppInfo;
-    public String top4AppInfo;
-    public String top5AppInfo;
+    public String top1AppInfo, top2AppInfo, top3AppInfo, top4AppInfo, top5AppInfo;
 
     //Muuttujat, jotka sisältävät applikaation paketin nimen
-    String top1Package;
-    String top2Package;
-    String top3Package;
-    String top4Package;
-    String top5Package;
+    String top1Package, top2Package, top3Package, top4Package, top5Package;
 
     //Drawablet, joihin tulee applikaatioiden ikonit
     Drawable icon1 = null;
@@ -61,14 +45,13 @@ public class Top5AppsFragment extends Fragment {
     String totalUsage = null;
     TextView totalUsageTimeText;
 
+    //Näkymä joka rakennetaan fragmentissa ja palautetaan lopuksi
     View view;
 
     // Store instance variables based on arguments passed
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        Log.d("Fragment", "onCreate");
     }
 
     @Override
@@ -77,6 +60,7 @@ public class Top5AppsFragment extends Fragment {
         super.onDestroy();
         getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
     }
+
     // Inflate the view for the fragment based on layout XML
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -196,6 +180,12 @@ public class Top5AppsFragment extends Fragment {
         Log.d("top4", top4Package);
         Log.d("top5", top5Package);
         */
+
+        Log.d("Fragment top1", top1AppInfo);
+        Log.d("Fragment top2", top2AppInfo);
+        Log.d("Fragment top3", top3AppInfo);
+        Log.d("Fragment top4", top4AppInfo);
+        Log.d("Fragment top5", top5AppInfo);
 
         Log.d("Jaetut tiedot haettu", "OK");
     }
