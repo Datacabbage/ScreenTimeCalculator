@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 public class AppStatsManager extends AppCompatActivity {
 
-    //Muuttujat, joihin alustetaan top5 käytetyt appsit
+    //Muuttujat, joihin alustetaan top5Millis käytetyt appsit
     long top1, top2, top3, top4, top5;
 
     //Muuttujat, joihin alustetaan TOP5 appsin nimi
@@ -59,7 +59,7 @@ public class AppStatsManager extends AppCompatActivity {
         StringBuilder top4StringBuilder = new StringBuilder();
         StringBuilder top5StringBuilder = new StringBuilder();
 
-        //Tarkastetaan onko appi jo top5 listalla, jos on, niin nollataan
+        //Tarkastetaan onko appi jo top5Millis listalla, jos on, niin nollataan
         //checkIfAppAlreadyExist(appName);
         if(checkIfAppAlreadyExist(appName).equals("null"))
         {
@@ -68,7 +68,7 @@ public class AppStatsManager extends AppCompatActivity {
             usageTime = 0;
         }
 
-        //Jos käyttöaika on isompi kuin top1
+        //Jos käyttöaika on isompi kuin top1Millis
         if(usageTime > top1)
         {
             top5 = top4;
@@ -77,7 +77,7 @@ public class AppStatsManager extends AppCompatActivity {
             top2 = top1;
             top1 = usageTime;
 
-            //Log.d("Bigger than", "top1");
+            //Log.d("Bigger than", "top1Millis");
 
             top5App = top4App;
             top4App = top3App;
@@ -91,10 +91,10 @@ public class AppStatsManager extends AppCompatActivity {
             top2Package = top1Package;
             top1Package = packageName;
 
-            //Log.d("top1 set: ", top1App);
+            //Log.d("top1Millis set: ", top1AppName);
         }
 
-        //Jos käyttöaika on isompi kuin top2, mutta pienempi kuin top1
+        //Jos käyttöaika on isompi kuin top2Millis, mutta pienempi kuin top1Millis
         else if(usageTime > top2 && usageTime < top1)
         {
             top5 = top4;
@@ -102,7 +102,7 @@ public class AppStatsManager extends AppCompatActivity {
             top3 = top2;
             top2 = usageTime;
 
-            //Log.d("Bigger than", "top2");
+            //Log.d("Bigger than", "top2Millis");
 
             top5App = top4App;
             top4App = top3App;
@@ -114,17 +114,17 @@ public class AppStatsManager extends AppCompatActivity {
             top3Package = top2Package;
             top2Package = packageName;
 
-            //Log.d("top2 set: ", top2App);
+            //Log.d("top2Millis set: ", top2AppName);
         }
 
-        //Jos käyttöaika on isompi kuin top3, mutta pienempi kuin top2
+        //Jos käyttöaika on isompi kuin top3Millis, mutta pienempi kuin top2Millis
         else if(usageTime > top3 && usageTime < top2)
         {
             top5 = top4;
             top4 = top3;
             top3 = usageTime;
 
-            //Log.d("Bigger than", "top3");
+            //Log.d("Bigger than", "top3Millis");
 
             top5App = top4App;
             top4App = top3App;
@@ -134,16 +134,16 @@ public class AppStatsManager extends AppCompatActivity {
             top4Package = top3Package;
             top3Package = packageName;
 
-            //Log.d("top3 set: ", top3App);
+            //Log.d("top3Millis set: ", top3AppName);
         }
 
-        //Jos käyttöaika on isompi kuin top4, mutta pienempi kuin top3
+        //Jos käyttöaika on isompi kuin top4Millis, mutta pienempi kuin top3Millis
         else if(usageTime > top4 && usageTime < top3)
         {
             top5 = top4;
             top4 = usageTime;
 
-            //Log.d("Bigger than", "top4");
+            //Log.d("Bigger than", "top4Millis");
 
             top5App = top4App;
             top4App = appName;
@@ -151,19 +151,19 @@ public class AppStatsManager extends AppCompatActivity {
             top5Package = top4Package;
             top4Package = packageName;
 
-            //Log.d("top4 set: ", top4App);
+            //Log.d("top4Millis set: ", top4AppName);
         }
 
-        //jos käyttöaika on isompi kuin top4, mutta pienempi kuin top4
+        //jos käyttöaika on isompi kuin top4Millis, mutta pienempi kuin top4Millis
         else if(usageTime > top5 && usageTime < top4)
         {
             top5 = usageTime;
 
-            //Log.d("Bigger than", "top5");
+            //Log.d("Bigger than", "top5Millis");
             top5App = appName;
             top5Package = packageName;
 
-            //Log.d("top5 set: ", top5App);
+            //Log.d("top5Millis set: ", top5AppName);
         }
 
         Converter converter = null;

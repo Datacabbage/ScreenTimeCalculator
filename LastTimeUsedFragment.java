@@ -1,11 +1,13 @@
 package tuomomees.screentimecalculator;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Luokan on luonut tuomo päivämäärällä 7.6.2017.
@@ -45,6 +47,16 @@ public class LastTimeUsedFragment extends Fragment {
         //args.putString("someTitle", title);
         //fragmentFirst.setArguments(args);
         return fragmentFirst;
+    }
+
+
+
+    protected String getSharedPreferences(String sharedPrefTag, String sharedVariableTag)
+    {
+        SharedPreferences pref = this.getActivity().getSharedPreferences(sharedPrefTag, MODE_PRIVATE);
+        String str = pref.getString(sharedVariableTag, null);
+
+        return str;
     }
 
     /*
