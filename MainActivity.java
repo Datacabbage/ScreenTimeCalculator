@@ -158,7 +158,7 @@ public class MainActivity extends FragmentActivity{
     protected void onResume()
     {
         Log.d("mActivity", "onResume()");
-        refreshFragment(top5AppsFragment);
+        //refreshFragment(top5AppsFragment);
         super.onResume();
     }
 

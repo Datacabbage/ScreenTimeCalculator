@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Top5AppsFragment extends Fragment {
 
-
     //TESTI
     Map<String, UsageStats> usageStats;
     List<UsageStats> stats;
@@ -80,39 +79,17 @@ public class Top5AppsFragment extends Fragment {
     AppStatsManager aStatsManager = new AppStatsManager();
     Converter timeConverter = new Converter();
 
-    //String[] apps;
-
     Data[] appData;
 
     int idCounter = 0;
-
-
     int id = 0;
 
     //Muuttujat, joihin tulee kokonaiskäyttöaika
     long totalUsageTimeMillis = 0;
     long totalUsageTimeMinutes = 0;
 
-    // Store instance variables based on arguments passed
     @Override
     public void onCreate(Bundle savedInstanceState) {super.onCreate(savedInstanceState);}
-
-
-/*
-    @Override
-    public void onDetach()
-    {
-        Log.d("top5AppsFragment", "onDetach");
-
-        super.onDetach();
-
-        getFragmentManager()
-                .beginTransaction()
-                .remove(this)
-                //.detach(this)
-                .commit();
-    }
-*/
 
     // Inflate the view for the fragment based on layout XML
     @Override
@@ -137,7 +114,7 @@ public class Top5AppsFragment extends Fragment {
     }
 
     //Metodi, jolla voi lisätä jaetun muuttujan
-    protected void setSharedPreferences(String sharedPrefTag, String sharedVariableTag, String sharedVariable)
+    protected void setSharedPreference(String sharedPrefTag, String sharedVariableTag, String sharedVariable)
     {
         //Lähetetään tiedot Fragmenttiin SharedPreferencen avulla
         SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences(sharedPrefTag, MODE_PRIVATE);
@@ -348,12 +325,8 @@ public class Top5AppsFragment extends Fragment {
 
             //Calendar for query
             Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DAY_OF_WEEK, -1);
-
-            Calendar calendar = Calendar.getInstance();
-            long endTime = calendar.getTimeInMillis();
-            long startTime = calendar.getTimeInMillis();
-            //endTime.add(Calendar.DAY_OF_MONTH, +1);
+            //Nykyinen aika - yksi päivä
+            //cal.add(Calendar.DAY_OF_WEEK, - 1);
 
             //Poimii tiedot aina 24H sisällä, eli 24H liukuu jatkuvasti ns. mukana
             //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, System.currentTimeMillis()- TimeUnit.DAYS.toMillis(1),System.currentTimeMillis()+ TimeUnit.DAYS.toMillis(1));
@@ -361,7 +334,11 @@ public class Top5AppsFragment extends Fragment {
             //Alkuperäinen query, jolla tulee ongelmallisesti tuplatapauksia
             //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, cal.getTimeInMillis(), System.currentTimeMillis());
 
-            usageStats = lUsageStatsManager.queryAndAggregateUsageStats(cal.getTimeInMillis(), System.currentTimeMillis());
+
+            //usageStats = lUsageStatsManager.queryAndAggregateUsageStats(cal.getTimeInMillis(), System.currentTimeMillis());
+
+            //Hakee tiedot 24H sisällä eli 86400000 millis
+            usageStats = lUsageStatsManager.queryAndAggregateUsageStats(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1), System.currentTimeMillis());
             stats = new ArrayList<>();
             stats.addAll(usageStats.values());
 
@@ -385,11 +362,8 @@ public class Top5AppsFragment extends Fragment {
                 //Alustaa taulukon, johon tulee käyttäjän kaikki applikaatiot (nimi, id, käyttöaika)
                 initializeAppArray(aLabelName, totalTimeInForeground);
 
-                //checkDuplicateApps(aStatsManager.getAppLabel(lUsageStats.getPackageName(), getActivity().getApplicationContext()), lUsageStats.getTotalTimeInForeground());
-
                 //Mikäli appsia on käytetty enemmän kuin minuutti
-                //if(((totalTimeForeground/ 1000)/60) > 0 )
-                if(timeConverter.convertMillisToMinutes(totalTimeInForeground)> 0 )
+                if(timeConverter.convertMillisToMinutes(totalTimeInForeground) > 0 )
                 {
                     //Tarkastaa TOP5 käytetyimmät appsit
                     checkMostUsed(aStatsManager.getAppLabel(lUsageStats.getPackageName(), getActivity().getApplicationContext()),lUsageStats.getPackageName(), lUsageStats.getTotalTimeInForeground());
@@ -685,6 +659,13 @@ public class Top5AppsFragment extends Fragment {
         top3AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
         top4AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
         top5AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
+
+        //Nollataan imageviewit
+        top1Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
+        top2Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
+        top3Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
+        top4Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
+        top5Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
 
         //Nollataan kokonaisruutuaika tekstikenttä
         totalUsageTimeText.setText(getResources().getString(R.string.usagerequestfailed_text));
