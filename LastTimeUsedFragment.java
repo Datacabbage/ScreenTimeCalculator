@@ -71,7 +71,11 @@ public class LastTimeUsedFragment extends Fragment {
         top4AppInfo = getSharedPreferences("sharedStats", "top4LastUsed");
         top5AppInfo = getSharedPreferences("sharedStats", "top5LastUsed");
 
-
+        top1Package = getSharedPreferences("sharedStats", "top1LastUsedPackage");
+        top2Package = getSharedPreferences("sharedStats", "top2LastUsedPackage");
+        top3Package = getSharedPreferences("sharedStats", "top3LastUsedPackage");
+        top4Package = getSharedPreferences("sharedStats", "top4LastUsedPackage");
+        top5Package = getSharedPreferences("sharedStats", "top5LastUsedPackage");
     }
 
     public void setTextViewTexts()
@@ -158,14 +162,12 @@ public class LastTimeUsedFragment extends Fragment {
         top5AppTextView = (TextView) view.findViewById(R.id.top5AppText);
         totalUsageTimeText = (TextView) view.findViewById(R.id.textViewTotalTimeSecond);
 
-
         //Alustetaan ImageViewit
         top1Icon = (ImageView) view.findViewById(R.id.imageViewTop1App);
         top2Icon = (ImageView) view.findViewById(R.id.imageViewTop2App);
         top3Icon = (ImageView) view.findViewById(R.id.imageViewTop3App);
         top4Icon = (ImageView) view.findViewById(R.id.imageViewTop4App);
         top5Icon = (ImageView) view.findViewById(R.id.imageViewTop5App);
-
     }
 
     // newInstance constructor for creating fragment with arguments
@@ -178,8 +180,7 @@ public class LastTimeUsedFragment extends Fragment {
         return fragmentFirst;
     }
 
-
-
+    //Metodi, jolla voi hakea jaetun muuttujan
     protected String getSharedPreferences(String sharedPrefTag, String sharedVariableTag)
     {
         SharedPreferences pref = this.getActivity().getSharedPreferences(sharedPrefTag, MODE_PRIVATE);
@@ -187,14 +188,4 @@ public class LastTimeUsedFragment extends Fragment {
 
         return str;
     }
-
-    /*
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_lasttimeused, container, false);
-    }
-    */
-
 }

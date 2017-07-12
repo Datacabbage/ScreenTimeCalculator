@@ -68,29 +68,34 @@ class AppStatsQueryThread extends Thread {
 
         final UsageStatsManager lUsageStatsManager = (UsageStatsManager) mContext.getSystemService(Context.USAGE_STATS_SERVICE);
 
-        Calendar cal = Calendar.getInstance();
-        //Nykyinen aika - yksi päivä
-        //cal.add(Calendar.DAY_OF_WEEK, - 1);
+        //Asetetaan alkuarvot
+        setStartValues();
 
-        //Alkuperäinen query, jolla tulee ongelmallisesti tuplatapauksia
-        //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, cal.getTimeInMillis(), System.currentTimeMillis());
-
-        //usageStats = lUsageStatsManager.queryAndAggregateUsageStats(cal.getTimeInMillis(), System.currentTimeMillis());
-
-        //Hakee tiedot 24H sisällä eli 86400000 millis
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final Date currentDate = Calendar.getInstance().getTime();
 
-            Log.d("DATE", String.valueOf(currentDate));
+            //Otetaan tämän päivän aikatiedot millisekunteina
+            Calendar cal1 = Calendar.getInstance();
+            cal1.set(Calendar.HOUR_OF_DAY, 0);
+            cal1.set(Calendar.MINUTE, 0);
+            cal1.set(Calendar.SECOND, 0);
+            cal1.set(Calendar.MILLISECOND, 0);
+
+            long begin = cal1.getTimeInMillis();
+            //Lisätään yksi päivä ja otetaan ylös millisekunteina
+            cal1.add(Calendar.DAY_OF_YEAR, 1);
+            //Lisätään sekunti, jotta ohjelma saa hieman pelivaraa lagien varalta
+            cal1.add(Calendar.SECOND, 1);
+            long end = cal1.getTimeInMillis();
+
+            Log.d("Haetaan aikavälillä ", timeConverter.convertMillisToDate(begin) + " - " + timeConverter.convertMillisToDate(end));
+
             //usageStatsUsageTimeApps = lUsageStatsManager.queryAndAggregateUsageStats(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1), System.currentTimeMillis());
-
-            usageStatsUsageTimeApps = lUsageStatsManager.queryAndAggregateUsageStats(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1), System.currentTimeMillis());
+            usageStatsUsageTimeApps = lUsageStatsManager.queryAndAggregateUsageStats(begin, end);
         }
         listUsageTimeApps = new ArrayList<>();
         listUsageTimeApps.addAll(usageStatsUsageTimeApps.values());
 
-        Log.d("How many apps ", String.valueOf(listUsageTimeApps.size()));
-
+        Log.d("Appeja yhteensä ", String.valueOf(listUsageTimeApps.size()));
 
         //Looppi, joka käy läpi käyttäjän kaikki appsit
         for(UsageStats lUsageStats:listUsageTimeApps){
@@ -98,30 +103,19 @@ class AppStatsQueryThread extends Thread {
 
                 counter++;
 
-                //Hakee applikaation nimen
-                String aLabelName = aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext());
-                //Hakee applikaation paketin nimen
-                String aPackageName = lUsageStats.getPackageName();
                 //Hakee applikaation käyttöajan
                 long totalTimeInForeground = lUsageStats.getTotalTimeInForeground();
-
-                //Alustaa taulukon, johon tulee käyttäjän kaikki applikaatiot (nimi, id, käyttöaika)
-                //initializeAppArray(aLabelName, totalTimeInForeground);
 
                 //Mikäli appsia on käytetty enemmän kuin minuutti
                 if(timeConverter.convertMillisToMinutes(totalTimeInForeground) > 0 )
                 {
-
+                    Log.d("Tänään käytetty", aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()) + " yhteensä: " + timeConverter.convertMillisToHoursMinutesSeconds(lUsageStats.getTotalTimeInForeground()));
 
                     //Hakee koska appia on viimeksi käytetty
                     long lastTimeUsed = lUsageStats.getLastTimeUsed();
 
-
-
-                    //Log.d(aLabelName, " viimeksi käytetty " + lastTimeUsedString);
-
                     //Tarkastaa mitä appeja on käytetty viimeksi TOP5
-                    checkLastUsedApp(lastTimeUsed, aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()));
+                    checkLastUsedApp(lastTimeUsed, lUsageStats.getPackageName());
 
                     //Tarkastaa TOP5 käytetyimmät appsit
                     checkMostUsed(aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()),lUsageStats.getPackageName(), lUsageStats.getTotalTimeInForeground());
@@ -130,6 +124,7 @@ class AppStatsQueryThread extends Thread {
                     calculateTotalTime(lUsageStats.getTotalTimeInForeground(), aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()));
                 }
 
+                //Kun kaikki appsit on käyty läpi
                 if(counter == listUsageTimeApps.size())
                 {
                     setSharedPreference("sharedStats", "totalUsage", totalUsage);
@@ -145,7 +140,6 @@ class AppStatsQueryThread extends Thread {
                     setSharedPreference("sharedStats", "top4AppPackage", top4Package);
                     setSharedPreference("sharedStats", "top5AppPackage", top5Package);
 
-
                     StringBuilder top1StringBuilder = new StringBuilder();
                     StringBuilder top2StringBuilder = new StringBuilder();
                     StringBuilder top3StringBuilder = new StringBuilder();
@@ -158,11 +152,11 @@ class AppStatsQueryThread extends Thread {
                     String str4 = timeConverter.convertMillisToDate(top4);
                     String str5 = timeConverter.convertMillisToDate(top5);
 
-                    top1StringBuilder.append("1. ").append(top1App).append("\r\n").append(str1).append("\r\n");
-                    top2StringBuilder.append("2. ").append(top2App).append("\r\n").append(str2).append("\r\n");
-                    top3StringBuilder.append("3. ").append(top3App).append("\r\n").append(str3).append("\r\n");
-                    top4StringBuilder.append("4. ").append(top4App).append("\r\n").append(str4).append("\r\n");
-                    top5StringBuilder.append("5. ").append(top5App).append("\r\n").append(str5).append("\r\n");
+                    top1StringBuilder.append("1. ").append(aStatsManager.getAppLabel(top1App, mContext.getApplicationContext())).append("\r\n").append(str1).append("\r\n");
+                    top2StringBuilder.append("2. ").append(aStatsManager.getAppLabel(top2App, mContext.getApplicationContext())).append("\r\n").append(str2).append("\r\n");
+                    top3StringBuilder.append("3. ").append(aStatsManager.getAppLabel(top3App, mContext.getApplicationContext())).append("\r\n").append(str3).append("\r\n");
+                    top4StringBuilder.append("4. ").append(aStatsManager.getAppLabel(top4App, mContext.getApplicationContext())).append("\r\n").append(str4).append("\r\n");
+                    top5StringBuilder.append("5. ").append(aStatsManager.getAppLabel(top5App, mContext.getApplicationContext())).append("\r\n").append(str5).append("\r\n");
 
                     String top1LastTimeUsedInfo = top1StringBuilder.toString();
                     String top2LastTimeUsedInfo = top2StringBuilder.toString();
@@ -175,6 +169,12 @@ class AppStatsQueryThread extends Thread {
                     setSharedPreference("sharedStats", "top3LastUsed", top3LastTimeUsedInfo);
                     setSharedPreference("sharedStats", "top4LastUsed", top4LastTimeUsedInfo);
                     setSharedPreference("sharedStats", "top5LastUsed", top5LastTimeUsedInfo);
+
+                    setSharedPreference("sharedStats", "top1LastUsedPackage", top1App);
+                    setSharedPreference("sharedStats", "top2LastUsedPackage", top2App);
+                    setSharedPreference("sharedStats", "top3LastUsedPackage", top3App);
+                    setSharedPreference("sharedStats", "top4LastUsedPackage", top4App);
+                    setSharedPreference("sharedStats", "top5LastUsedPackage", top5App);
                 }
             }
         }
@@ -203,6 +203,55 @@ class AppStatsQueryThread extends Thread {
         totalUsage = totalUsageStringBuilder.toString();
 
         return totalUsage;
+    }
+
+    private void setStartValues()
+    {
+        usageStatsUsageTimeApps = null;
+        listUsageTimeApps = null;
+        lUsageStatsList = null;
+
+        //Nollataan viimeksi käytetty aika
+        top1 = 0;
+        top2 = 0;
+        top3 = 0;
+        top4 = 0;
+        top5 = 0;
+
+        //Nollataan appien tiedot
+        top1AppInfo = null;
+        top2AppInfo = null;
+        top3AppInfo = null;
+        top4AppInfo = null;
+        top5AppInfo = null;
+
+        //Nollataan käyttöajat
+        top1Millis = 0;
+        top2Millis = 0;
+        top3Millis = 0;
+        top4Millis = 0;
+        top5Millis = 0;
+
+        //Nollataan pakettien nimet
+        top1Package = null;
+        top2Package = null;
+        top3Package = null;
+        top4Package = null;
+        top5Package = null;
+
+        //Nollataan appsien nimet
+        top1AppName = null;
+        top2AppName = null;
+        top3AppName = null;
+        top4AppName = null;
+        top5AppName = null;
+
+        //Nollataan kokonaisruutuaika
+        totalUsageTimeMinutes = 0;
+        totalUsageTimeMillis = 0;
+        totalUsage = null;
+
+        Log.d("Arvojen nollaus ", "Thread: OK");
     }
 
     //TOP5 applikaatiot tsekataan tässä metodissa
@@ -341,7 +390,7 @@ class AppStatsQueryThread extends Thread {
     }
 
     //Metodi, jolla näkee mitä appeja on käytetty viimeksi top5
-    private void checkLastUsedApp(long lastTimeUsed, String appName)
+    private void checkLastUsedApp(long lastTimeUsed, String packageName)
     {
         if(lastTimeUsed > top1)
         {
@@ -355,7 +404,7 @@ class AppStatsQueryThread extends Thread {
             top4App = top3App;
             top3App = top2App;
             top2App = top1App;
-            top1App = appName;
+            top1App = packageName;
         }
 
         if(lastTimeUsed > top2 && lastTimeUsed < top1)
@@ -368,7 +417,7 @@ class AppStatsQueryThread extends Thread {
             top5App = top4App;
             top4App = top3App;
             top3App = top2App;
-            top2App = appName;
+            top2App = packageName;
         }
 
         if(lastTimeUsed > top3 && lastTimeUsed < top2)
@@ -379,7 +428,7 @@ class AppStatsQueryThread extends Thread {
 
             top5App = top4App;
             top4App = top3App;
-            top3App = appName;
+            top3App = packageName;
         }
 
         if(lastTimeUsed > top4 && lastTimeUsed < top3)
@@ -388,14 +437,14 @@ class AppStatsQueryThread extends Thread {
             top4 = lastTimeUsed;
 
             top5App = top4App;
-            top4App = appName;
+            top4App = packageName;
         }
 
         if(lastTimeUsed > top5 && lastTimeUsed < top4)
         {
             top5 = lastTimeUsed;
 
-            top5App = appName;
+            top5App = packageName;
         }
     }
 }

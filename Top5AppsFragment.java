@@ -2,8 +2,6 @@ package tuomomees.screentimecalculator;
 
 
 import android.app.AppOpsManager;
-import android.app.usage.UsageStats;
-import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,29 +20,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import static android.content.Context.MODE_PRIVATE;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import static android.content.Context.MODE_PRIVATE;
 
 
 public class Top5AppsFragment extends Fragment {
 
-    //TESTI
-    Map<String, UsageStats> usageStats;
-    List<UsageStats> stats;
-
     private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 100;
-
-    // Store instance variables
-    private String title;
-    private int page;
-
-    //Alustetaan lista, johon tulee käyttötiedot
-    List<UsageStats> lUsageStatsList;
 
     //TextViewit, joihin asetetaan näkyviin top5Millis applikaatioiden infot
     TextView top1AppTextView, top2AppTextView, top3AppTextView, top4AppTextView, top5AppTextView;
@@ -73,15 +55,6 @@ public class Top5AppsFragment extends Fragment {
 
     //Näkymä joka rakennetaan fragmentissa ja palautetaan lopuksi
     View view;
-
-    //TESTI
-    AppStatsManager aStatsManager = new AppStatsManager();
-    Converter timeConverter = new Converter();
-
-    Data[] appData;
-
-    int idCounter = 0;
-    int id = 0;
 
     //Muuttujat, joihin tulee kokonaiskäyttöaika
     long totalUsageTimeMillis = 0;
@@ -128,40 +101,6 @@ public class Top5AppsFragment extends Fragment {
         editor.apply();
         Log.d("Shared variable", sharedVariable + " with tag " + sharedVariableTag);
     }
-
-    /*
-    //Metodi, jolla asetetaan textvieweihin tekstit
-    protected void setTextViewTexts()
-    {
-        //Nollataan tekstikentät, mikäli tekstien haku epäonnistuu
-        top1AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
-        top2AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
-        top3AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
-        top4AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
-        top5AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
-
-        //Asetetaan kokonaiskäyttöaika, mikäli se ei ole tyhjä
-        if(totalUsage != null)
-        {totalUsageTimeText.setText(totalUsage);}
-
-        if(top1Millis != 0)
-        {top1AppTextView.setText(top1AppInfo);}
-
-        if(top2Millis != 0)
-        {top2AppTextView.setText(top2AppInfo);}
-
-        if(top3Millis != 0)
-        {top3AppTextView.setText(top3AppInfo);}
-
-        if(top4Millis != 0)
-        {top4AppTextView.setText(top4AppInfo);}
-
-        if(top5Millis != 0)
-        {top5AppTextView.setText(top5AppInfo);}
-
-        Log.d("Top5 tekstit asetettu", "OK");
-    }
-    */
 
     protected void setTextViewTexts()
     {
@@ -339,110 +278,9 @@ public class Top5AppsFragment extends Fragment {
 
     private void getStats() {
 
-        /*
-        //Alla olevilla laineilla haetaan aikatiedot
-        final int currentDate = Calendar.getInstance().get(Calendar.DATE);
-        final int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        final int currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        final int currentDayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-
-        Log.d("Tunnit", String.valueOf(currentHour));
-        Log.d("PVM", String.valueOf(currentDate));
-        Log.d("Vuosi", String.valueOf(currentYear));
-        Log.d("DOY", String.valueOf(currentDayOfYear));
-
-        */
-
-        final UsageStatsManager lUsageStatsManager = (UsageStatsManager) getActivity().getSystemService(Context.USAGE_STATS_SERVICE);
-
-            //lUsageStatsManager = (UsageStatsManager) getActivity().getSystemService(Context.USAGE_STATS_SERVICE);
-
-
-        /*
-        //Toimii ainoastaan Androidin versiolla 5.0 tai uudempi
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-
-            Calendar cal = Calendar.getInstance();
-            //Nykyinen aika - yksi päivä
-            //cal.add(Calendar.DAY_OF_WEEK, - 1);
-
-            //Alkuperäinen query, jolla tulee ongelmallisesti tuplatapauksia
-            //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, cal.getTimeInMillis(), System.currentTimeMillis());
-
-            //usageStats = lUsageStatsManager.queryAndAggregateUsageStats(cal.getTimeInMillis(), System.currentTimeMillis());
-
-            //Hakee tiedot 24H sisällä eli 86400000 millis
-            usageStats = lUsageStatsManager.queryAndAggregateUsageStats(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1), System.currentTimeMillis());
-            stats = new ArrayList<>();
-            stats.addAll(usageStats.values());
-
-            Log.d("How many apps ", String.valueOf(stats.size()));
-        }
-*/
-
-
         Context context = getActivity().getApplicationContext();
         Thread appStatsQueryThread = new AppStatsQueryThread(context);
         appStatsQueryThread.run();
-
-        /*
-        //Testi, jossa luodaan uusi säie eli thread
-        new Thread(new Runnable() {
-            public void run() {
-
-                //Toimii ainoastaan Androidin versiolla 5.0 tai uudempi
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-
-                    Calendar cal = Calendar.getInstance();
-                    //Nykyinen aika - yksi päivä
-                    //cal.add(Calendar.DAY_OF_WEEK, - 1);
-
-                    //Alkuperäinen query, jolla tulee ongelmallisesti tuplatapauksia
-                    //lUsageStatsList = lUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, cal.getTimeInMillis(), System.currentTimeMillis());
-
-                    //usageStats = lUsageStatsManager.queryAndAggregateUsageStats(cal.getTimeInMillis(), System.currentTimeMillis());
-
-                    //Hakee tiedot 24H sisällä eli 86400000 millis
-                    usageStats = lUsageStatsManager.queryAndAggregateUsageStats(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1), System.currentTimeMillis());
-                    stats = new ArrayList<>();
-                    stats.addAll(usageStats.values());
-
-                    Log.d("How many apps ", String.valueOf(stats.size()));
-                }
-
-                //Looppi, joka käy läpi käyttäjän kaikki appsit
-                for(UsageStats lUsageStats:stats){
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-                        //Hakee applikaation nimen
-                        String aLabelName = aStatsManager.getAppLabel(lUsageStats.getPackageName(), getActivity().getApplicationContext());
-                        //Hakee applikaation paketin nimen
-                        String aPackageName = lUsageStats.getPackageName();
-                        //Hakee applikaation käyttöajan
-                        long totalTimeInForeground = lUsageStats.getTotalTimeInForeground();
-
-                        //Alustaa taulukon, johon tulee käyttäjän kaikki applikaatiot (nimi, id, käyttöaika)
-                        initializeAppArray(aLabelName, totalTimeInForeground);
-
-                        //Mikäli appsia on käytetty enemmän kuin minuutti
-                        if(timeConverter.convertMillisToMinutes(totalTimeInForeground) > 0 )
-                        {
-                            //Tarkastaa TOP5 käytetyimmät appsit
-                            checkMostUsed(aStatsManager.getAppLabel(lUsageStats.getPackageName(), getActivity().getApplicationContext()),lUsageStats.getPackageName(), lUsageStats.getTotalTimeInForeground());
-
-                            //Tarkastaa yhteensä appsien käyttämän ajan
-                            calculateTotalTime(lUsageStats.getTotalTimeInForeground(), aStatsManager.getAppLabel(lUsageStats.getPackageName(), getActivity().getApplicationContext()));
-
-                            setSharedPreference("sharedStats", "totalUsage", totalUsage);
-
-                        }
-                    }
-                }
-            }
-        }).start();
-
-*/
-
 
         totalUsage = getSharedPreferences("sharedStats", "totalUsage");
         top1AppInfo = getSharedPreferences("sharedStats", "top1AppInfo");
@@ -456,229 +294,6 @@ public class Top5AppsFragment extends Fragment {
         top3Package = getSharedPreferences("sharedStats", "top3AppPackage");
         top4Package = getSharedPreferences("sharedStats", "top4AppPackage");
         top5Package = getSharedPreferences("sharedStats", "top5AppPackage");
-
-        Log.d("getting sharedPref", "totalUsage");
-        if(totalUsage != null)
-        {
-            Log.d("pref", totalUsage);
-        }
-
-
-
-
-        /*
-        for(UsageStats lUsageStats:stats){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-                //Hakee applikaation nimen
-                String aLabelName = aStatsManager.getAppLabel(lUsageStats.getPackageName(), getActivity().getApplicationContext());
-                //Hakee applikaation paketin nimen
-                String aPackageName = lUsageStats.getPackageName();
-                //Hakee applikaation käyttöajan
-                long totalTimeInForeground = lUsageStats.getTotalTimeInForeground();
-
-                //Alustaa taulukon, johon tulee käyttäjän kaikki applikaatiot (nimi, id, käyttöaika)
-                initializeAppArray(aLabelName, totalTimeInForeground);
-
-                //Mikäli appsia on käytetty enemmän kuin minuutti
-                if(timeConverter.convertMillisToMinutes(totalTimeInForeground) > 0 )
-                {
-                    //Tarkastaa TOP5 käytetyimmät appsit
-                    checkMostUsed(aStatsManager.getAppLabel(lUsageStats.getPackageName(), getActivity().getApplicationContext()),lUsageStats.getPackageName(), lUsageStats.getTotalTimeInForeground());
-
-                    //Tarkastaa yhteensä appsien käyttämän ajan
-                    calculateTotalTime(lUsageStats.getTotalTimeInForeground(), aStatsManager.getAppLabel(lUsageStats.getPackageName(), getActivity().getApplicationContext()));
-
-                    //Asetetaan tekstit ja ikonit vasta kun kaikki tiedot on haettu
-                    if(stats.size() - 1  <= id)
-                    {
-                        //Asettaa aikatiedot näkyviin textvieweihin
-                        setTextViewTexts();
-
-                        //Asettaa Top5 appsien ikonit näkyviin
-                        setIconDrawable();
-                    }
-
-                }
-            }
-        }
-        */
-
-
-
-    }
-
-    protected void initializeAppArray(String appName, long usageTime)
-    {
-        //Varmistaa, että taulukko luodaan vain kerran
-        //Taulukko, johon mahtuu kaikki applikaatioiden nimet
-        if(id == 0)
-        { appData = new Data[stats.size()]; }
-
-        Log.d("Alustetaan ", appName + " paikkaan " + id);
-
-        appData[id] = new Data(appName, id, usageTime);
-        id++;
-    }
-
-    //Metodi, jolla lasketaan yhteen kaikki käyttöajat
-    public String calculateTotalTime(long usageTime, String appName)
-    {
-        StringBuilder totalUsageStringBuilder = new StringBuilder();
-
-        totalUsageTimeMillis = totalUsageTimeMillis + usageTime;
-        totalUsageTimeMinutes = timeConverter.convertMillisToMinutes(totalUsageTimeMillis);
-
-        totalUsageStringBuilder.append(getResources().getString(R.string.totalusage_text)).append("\r\n").append(timeConverter.convertMillisToHoursMinutesSeconds(totalUsageTimeMillis));
-        totalUsage = totalUsageStringBuilder.toString();
-
-        return totalUsage;
-    }
-
-    //TOP5 applikaatiot tsekataan tässä metodissa
-    public long[] checkMostUsed(String appName, String packageName, long usageTime)
-    {
-        StringBuilder top1StringBuilder = new StringBuilder();
-        StringBuilder top2StringBuilder = new StringBuilder();
-        StringBuilder top3StringBuilder = new StringBuilder();
-        StringBuilder top4StringBuilder = new StringBuilder();
-        StringBuilder top5StringBuilder = new StringBuilder();
-
-        //Tarkastetaan onko appi jo top5Millis listalla, jos on, niin nollataan
-        if(checkIfAppAlreadyExist(appName).equals("null"))
-        {
-            appName = "null";
-            packageName = "null";
-            usageTime = 0;
-        }
-
-        //Jos käyttöaika on isompi kuin top1Millis
-        if(usageTime > top1Millis)
-        {
-            top5Millis = top4Millis;
-            top4Millis = top3Millis;
-            top3Millis = top2Millis;
-            top2Millis = top1Millis;
-            top1Millis = usageTime;
-
-            //Log.d("Bigger than", "top1Millis");
-
-            top5AppName = top4AppName;
-            top4AppName = top3AppName;
-            top3AppName = top2AppName;
-            top2AppName = top1AppName;
-            top1AppName = appName;
-
-            top5Package = top4Package;
-            top4Package = top3Package;
-            top3Package = top2Package;
-            top2Package = top1Package;
-            top1Package = packageName;
-
-            //Log.d("top1Millis set: ", top1AppName);
-        }
-
-        //Jos käyttöaika on isompi kuin top2Millis, mutta pienempi kuin top1Millis
-        else if(usageTime > top2Millis && usageTime < top1Millis)
-        {
-            top5Millis = top4Millis;
-            top4Millis = top3Millis;
-            top3Millis = top2Millis;
-            top2Millis = usageTime;
-
-            //Log.d("Bigger than", "top2Millis");
-
-            top5AppName = top4AppName;
-            top4AppName = top3AppName;
-            top3AppName = top2AppName;
-            top2AppName = appName;
-
-            top5Package = top4Package;
-            top4Package = top3Package;
-            top3Package = top2Package;
-            top2Package = packageName;
-
-            //Log.d("top2Millis set: ", top2AppName);
-        }
-
-        //Jos käyttöaika on isompi kuin top3Millis, mutta pienempi kuin top2Millis
-        else if(usageTime > top3Millis && usageTime < top2Millis)
-        {
-            top5Millis = top4Millis;
-            top4Millis = top3Millis;
-            top3Millis = usageTime;
-
-            //Log.d("Bigger than", "top3Millis");
-
-            top5AppName = top4AppName;
-            top4AppName = top3AppName;
-            top3AppName = appName;
-
-            top5Package = top4Package;
-            top4Package = top3Package;
-            top3Package = packageName;
-
-            //Log.d("top3Millis set: ", top3AppName);
-        }
-
-        //Jos käyttöaika on isompi kuin top4Millis, mutta pienempi kuin top3Millis
-        else if(usageTime > top4Millis && usageTime < top3Millis)
-        {
-            top5Millis = top4Millis;
-            top4Millis = usageTime;
-
-            //Log.d("Bigger than", "top4Millis");
-
-            top5AppName = top4AppName;
-            top4AppName = appName;
-
-            top5Package = top4Package;
-            top4Package = packageName;
-
-            //Log.d("top4Millis set: ", top4AppName);
-        }
-
-        //jos käyttöaika on isompi kuin top4Millis, mutta pienempi kuin top4Millis
-        else if(usageTime > top5Millis && usageTime < top4Millis)
-        {
-            top5Millis = usageTime;
-
-            //Log.d("Bigger than", "top5Millis");
-            top5AppName = appName;
-            top5Package = packageName;
-
-            //Log.d("top5Millis set: ", top5AppName);
-        }
-
-        /*
-        Log.d("top1", top1AppName + " " + timeConverter.convertMillisToHoursMinutesSeconds(top1Millis));
-        Log.d("top2", top2AppName + " " + timeConverter.convertMillisToHoursMinutesSeconds(top2Millis));
-        Log.d("top3", top3AppName + " " + timeConverter.convertMillisToHoursMinutesSeconds(top3Millis));
-        Log.d("top4", top4AppName + " " + timeConverter.convertMillisToHoursMinutesSeconds(top4Millis));
-        Log.d("top5", top5AppName + " " + timeConverter.convertMillisToHoursMinutesSeconds(top5Millis));
-*/
-        String top1Time = timeConverter.convertMillisToHoursMinutesSeconds(top1Millis);
-        String top2Time = timeConverter.convertMillisToHoursMinutesSeconds(top2Millis);
-        String top3Time = timeConverter.convertMillisToHoursMinutesSeconds(top3Millis);
-        String top4Time = timeConverter.convertMillisToHoursMinutesSeconds(top4Millis);
-        String top5Time = timeConverter.convertMillisToHoursMinutesSeconds(top5Millis);
-
-        top1StringBuilder.append("1. ").append(top1AppName).append("\r\n").append(top1Time).append("\r\n");
-        top2StringBuilder.append("2. ").append(top2AppName).append("\r\n").append(top2Time).append("\r\n");
-        top3StringBuilder.append("3. ").append(top3AppName).append("\r\n").append(top3Time).append("\r\n");
-        top4StringBuilder.append("4. ").append(top4AppName).append("\r\n").append(top4Time).append("\r\n");
-        top5StringBuilder.append("5. ").append(top5AppName).append("\r\n").append(top5Time).append("\r\n");
-
-        String top1AppText, top2AppText, top3AppText, top4AppText, top5AppText;
-
-        top1AppInfo = top1StringBuilder.toString();
-        top2AppInfo = top2StringBuilder.toString();
-        top3AppInfo = top3StringBuilder.toString();
-        top4AppInfo = top4StringBuilder.toString();
-        top5AppInfo = top5StringBuilder.toString();
-
-
-        return new long[] {top1Millis, top2Millis, top3Millis, top4Millis, top5Millis};
     }
 
     protected void setStartValues()
@@ -725,121 +340,40 @@ public class Top5AppsFragment extends Fragment {
         totalUsageTimeMinutes = 0;
         totalUsageTimeMillis = 0;
 
-        //Nollataan id-laskuri
-        id = 0;
-
-        Log.d("Arvojen nollaus ", "OK");
+        Log.d("Arvojen nollaus ", "Most Used Fragment: OK");
     }
-
-    //Metodi, joka tarkastaa onko kyseinen appi jo TOP5 listalla
-    protected String checkIfAppAlreadyExist(String appName)
-    {
 
         /*
-        if(appName.equals(top1AppName) || appName.equals(top2AppName) || appName.equals(top3AppName) || appName.equals(top4AppName) || appName.equals(top5AppName))
-        {
-            Log.d("Toistamiseen", appName);
-            appName = "null";
-        }
-*/
-        return appName;
-    }
-
-    //Tarkistaa onko sama applikaatio esiintynyt useamman kerran, mikäli esiintyy, metodi laskee keskimääräisen käyttöajan
-    public long checkDuplicateApps(String appName)
+    //Metodi, jolla asetetaan textvieweihin tekstit
+    protected void setTextViewTexts()
     {
-        //Log.d("ID koko", String.valueOf(id));
+        //Nollataan tekstikentät, mikäli tekstien haku epäonnistuu
+        top1AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
+        top2AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
+        top3AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
+        top4AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
+        top5AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
 
-        long originalAppUsageTime;
-        long duplicateAppUsageTime;
+        //Asetetaan kokonaiskäyttöaika, mikäli se ei ole tyhjä
+        if(totalUsage != null)
+        {totalUsageTimeText.setText(totalUsage);}
 
-        int duplicateAppId;
-        int originalAppId;
+        if(top1Millis != 0)
+        {top1AppTextView.setText(top1AppInfo);}
 
-        //Varmistaa, että taulukossa on vähintään 2 arvoa, jotta niitä voidaan verrata
-        if(id > 0)
-        {
-            //Silmukka, joka on yhtä pitkä kuin alustettujen applikaatioiden määrä (ID:stä päätellen)
-            //for(int e = id; e >= 0; e--) {
-            for (int e = id - 1; e >= 0; e--) {
+        if(top2Millis != 0)
+        {top2AppTextView.setText(top2AppInfo);}
 
-                if(appName.equals(appData[e].appName))
-                {
-                    idCounter++;
+        if(top3Millis != 0)
+        {top3AppTextView.setText(top3AppInfo);}
 
-                    Log.d("App found in array", appData[e].appName + " @place: " + e);
+        if(top4Millis != 0)
+        {top4AppTextView.setText(top4AppInfo);}
 
-                    //Otetaan talteen alkuperäinen applikaation ID
-                    if(idCounter == 1 && appName.equals(appData[e].appName))
-                    {
-                        originalAppId = appData[e].appId;
-                        Log.d("OriginalAppID", String.valueOf(originalAppId));
-                        originalAppUsageTime = appData[originalAppId].appUsageTime;
+        if(top5Millis != 0)
+        {top5AppTextView.setText(top5AppInfo);}
 
-                        return originalAppUsageTime;
-                    }
-
-                    if(idCounter == 2 && appName.equals(appData[e].appName))
-                    {
-                        //Mikäli appi esiintyy useamman kerran taulukossa, otetaan talteen toinen app ID
-                        duplicateAppId = appData[e].appId;
-
-                        //Haetaan tupla-appin käyttämä aika
-                        duplicateAppUsageTime = appData[duplicateAppId].appUsageTime;
-
-                        Log.d("duplicateUsagetime2", String.valueOf(duplicateAppUsageTime));
-
-                        Log.d("DuplicateAppID", String.valueOf(duplicateAppId));
-
-                        Log.d("Same app again", appName + " times: " +  idCounter);
-
-                        //Mikäli appi esiintyy arrayssa useammin kuin kerran, palautetaan ainoastaan tuplapainoksen käyttöaika (alkup. on jo palautettu tässä vaiheessa)
-                        return duplicateAppUsageTime;
-                    }
-
-                    if(idCounter == 3 && appName.equals(appData[e].appName))
-                    {
-                        Log.d("Same app again", appName + " times: " +  idCounter);
-                    }
-
-                    //Log.d("App found in array", appName + " @place: " + e);
-                    //Log.d("App ID", String.valueOf(appData[e].appId));
-                }
-            }
-        }
-
-        //Nollataan appin esiintymiskertalaskuri, kun kaikki appit on vertailtu taulukosta
-        idCounter = 0;
-
-        return 0;
+        Log.d("Top5 tekstit asetettu", "OK");
     }
-
-    //Staattinen luokka, johon voi alustaa kaikki appsit ja niiden käyttöaika, sekä identifoida ne ID:n avulla
-    private static class Data
-    {
-        private String appName;
-        private int appId;
-        private long appUsageTime;
-
-        Data(String n, int id, long uT)
-        {
-            appName = n;
-            appId = id;
-            appUsageTime = uT;
-        }
-
-        public int getAppId()
-        {
-            return appId;
-        }
-
-        public String getAppName()
-        {
-            return appName;
-        }
-
-        public long getAppUsageTime() { return appUsageTime; }
-
-        public void setAppUsageTime(long usageTime){ appUsageTime = usageTime; }
-    }
+    */
 }
