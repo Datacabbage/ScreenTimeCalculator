@@ -32,9 +32,6 @@ public class MainActivity extends FragmentActivity{
 
         //SystemClock.sleep(5000);
 
-
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
