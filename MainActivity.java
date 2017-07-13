@@ -1,6 +1,7 @@
 package tuomomees.screentimecalculator;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -16,7 +17,7 @@ import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity{
 
-    //Alustetaan näytön koon muuttujat, jotta niitä voidaan käyttää globaalisti
+    //näytön koon muuttujat
     int height, width;
 
     MyPagerAdapter adapterViewPager;
@@ -26,6 +27,14 @@ public class MainActivity extends FragmentActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Teema täytyy kutsua ennen super.onCreate() -metodia
+        //setTheme(R.style.AppTheme);
+
+        //SystemClock.sleep(5000);
+
+
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -39,9 +48,6 @@ public class MainActivity extends FragmentActivity{
 
         //Tarkistaa mm. näytön koon
         checkDisplayStats();
-
-        //Piilottaa sovelluksen nimen
-        //getSupportActionBar().hide();
 
         //Tekee notification barista läpinäkyvän
         Window w = getWindow(); // in Activity's onCreate() for instance
@@ -138,21 +144,6 @@ public class MainActivity extends FragmentActivity{
         //Näytön koon tsekkaaminen Logissa
         Log.d("Näytön koko on", height + "x" + width);
     }
-/*
-    @Override
-    protected void onDestroy()
-    {
-        finish();
-
-        //Sulkee fragmentin ennen kuin MainActivity suljetaan finish() -metodilla
-        detachFragment(top5AppsFragment);
-
-        //Lopettaa MainActivityn, kun se ei ole näkyvissä
-
-
-        super.onDestroy();
-    }
-*/
 
     @Override
     protected void onResume()

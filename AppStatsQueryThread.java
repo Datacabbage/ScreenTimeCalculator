@@ -5,15 +5,15 @@ import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
+import java.util.TimeZone;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -73,8 +73,12 @@ class AppStatsQueryThread extends Thread {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
+
+            //Haetaan nykyinen aikavyöhyke, jotta aikatiedot tulevat oikein
+            TimeZone timeZone = TimeZone.getTimeZone("UTC");
+
             //Otetaan tämän päivän aikatiedot millisekunteina
-            Calendar cal1 = Calendar.getInstance();
+            Calendar cal1 = Calendar.getInstance(timeZone);
             cal1.set(Calendar.HOUR_OF_DAY, 0);
             cal1.set(Calendar.MINUTE, 0);
             cal1.set(Calendar.SECOND, 0);
@@ -390,9 +394,11 @@ class AppStatsQueryThread extends Thread {
     }
 
     //Metodi, jolla näkee mitä appeja on käytetty viimeksi top5
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void checkLastUsedApp(long lastTimeUsed, String packageName)
     {
-        if(lastTimeUsed > top1)
+        //Varmistetaan ettei tämä appi tule listalle
+        if(lastTimeUsed > top1 && !Objects.equals(packageName, mContext.getApplicationContext().getPackageName()))
         {
             top5 = top4;
             top4 = top3;

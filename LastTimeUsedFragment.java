@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ResourcesCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,10 +50,13 @@ public class LastTimeUsedFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_lasttimeused, container, false);
 
+        //Alustaa widgetit
         initialize();
 
+        //Hakee appien tiedot
         getStats();
 
+        //Asettaa tiedot näkyvii tekstikenttiin
         setTextViewTexts();
 
         //Asettaa Top5 appsien ikonit näkyviin
@@ -92,11 +96,11 @@ public class LastTimeUsedFragment extends Fragment {
     public void setIconDrawable()
     {
         //Asetetaan ikoneiksi perusikoni, mikäli ikonien haku epäonnistuu
-        top1Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
-        top2Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
-        top3Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
-        top4Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
-        top5Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
+        top1Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top2Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top3Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top4Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top5Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
 
         //Asetetaan TOP5 appsien iconit näkymään, mikäli arvot eivät ole NULL
         if(top1Package != null)
@@ -172,20 +176,14 @@ public class LastTimeUsedFragment extends Fragment {
 
     // newInstance constructor for creating fragment with arguments
     public static LastTimeUsedFragment newInstance(int page, String title) {
-        LastTimeUsedFragment fragmentFirst = new LastTimeUsedFragment();
-        //Bundle args = new Bundle();
-        //args.putInt("someInt", page);
-        //args.putString("someTitle", title);
-        //fragmentFirst.setArguments(args);
-        return fragmentFirst;
+        return new LastTimeUsedFragment();
     }
 
     //Metodi, jolla voi hakea jaetun muuttujan
     protected String getSharedPreferences(String sharedPrefTag, String sharedVariableTag)
     {
         SharedPreferences pref = this.getActivity().getSharedPreferences(sharedPrefTag, MODE_PRIVATE);
-        String str = pref.getString(sharedVariableTag, null);
 
-        return str;
+        return pref.getString(sharedVariableTag, null);
     }
 }

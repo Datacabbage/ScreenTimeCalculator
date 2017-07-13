@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 /**
- * Created by tuomo on 7.6.2017.
+ * Luokan on luonut tuomo päivämäärällä 7.6.2017.
  */
 
 // Since this is an object collection, use a FragmentStatePagerAdapter,

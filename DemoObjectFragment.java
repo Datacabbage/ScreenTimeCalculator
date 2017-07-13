@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
- * Created by tuomo on 7.6.2017.
+ * Luokan on luonut tuomo päivämäärällä 7.6.2017.
  */
 
 // Instances of this class are fragments representing a single

@@ -5,7 +5,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 
 /**
- * Created by tuomo on 7.6.2017.
+ * Luokan on luonut tuomo päivämäärällä 7.6.2017.
  */
 
 public class CollectionDemoActivity extends FragmentActivity {

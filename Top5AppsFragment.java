@@ -13,6 +13,7 @@ import android.os.Process;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,6 +60,8 @@ public class Top5AppsFragment extends Fragment {
     //Muuttujat, joihin tulee kokonaiskäyttöaika
     long totalUsageTimeMillis = 0;
     long totalUsageTimeMinutes = 0;
+
+    AppStatsManager appStatsManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {super.onCreate(savedInstanceState);}
@@ -126,11 +129,13 @@ public class Top5AppsFragment extends Fragment {
     protected void setIconDrawable()
     {
         //Asetetaan ikoneiksi perusikoni, mikäli ikonien haku epäonnistuu
-        top1Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
-        top2Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
-        top3Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
-        top4Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
-        top5Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
+        top1Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top2Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top3Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top4Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top5Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+
+        Context context = getContext().getApplicationContext();
 
         //Asetetaan TOP5 appsien iconit näkymään, mikäli arvot eivät ole NULL
         if(top1Package != null)
@@ -183,7 +188,6 @@ public class Top5AppsFragment extends Fragment {
         return pref.getString(sharedVariableTag, null);
     }
 
-
     //Metodi, jolla alustetaan tarvittavat widgetit
     protected void initialize()
     {
@@ -216,15 +220,7 @@ public class Top5AppsFragment extends Fragment {
     }
 
     // newInstance constructor for creating fragment with arguments
-    public static Top5AppsFragment newInstance(int page, String title) {
-        Top5AppsFragment top5AppsObj = new Top5AppsFragment();
-        Bundle args = new Bundle();
-
-        args.putInt("someInt", page);
-        args.putString("someTitle", title);
-        top5AppsObj.setArguments(args);
-        return top5AppsObj;
-    }
+    public static Top5AppsFragment newInstance(int page, String title) { return new Top5AppsFragment(); }
 
     //Mikäli sovelluksella on tarvittavat oikeudet, hakee statistiikan. Muussa tapauksessa pyytää tarvittavia oikeuksia.
     private void fillStats() {

@@ -7,7 +7,7 @@ import android.content.IntentFilter;
 import android.os.BatteryManager;
 
 /**
- * Created by tuomo on 6.5.2017.
+ * Luokan on luonut tuomo päivämäärällä 6.5.2017.
  */
 
 public class BatteryStatusChecker extends BroadcastReceiver {
@@ -31,7 +31,10 @@ public class BatteryStatusChecker extends BroadcastReceiver {
         Intent batteryStatus = context.registerReceiver(null, ifilter);
 
         // Onko laite laturissa tai ladattu
-        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        int status = 0;
+        if (batteryStatus != null) {
+            status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        }
         boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
                 status == BatteryManager.BATTERY_STATUS_FULL;
 
