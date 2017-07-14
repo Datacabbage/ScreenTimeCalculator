@@ -1,6 +1,7 @@
 package tuomomees.screentimecalculator;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -53,7 +54,8 @@ class Converter {
 
         else
         {
-            return "Something wrong with converter";
+            Log.d("Error code", "1");
+            return "Error code: 1";
         }
 
         //Log.d("Muunnettu", usageTime);
@@ -70,19 +72,12 @@ class Converter {
 
     String convertMillisToDate(long millis)
     {
-        String dateFormat = "hh:mm:ss dd.MM.yyyy";
-
-        // Create a DateFormatter object for displaying date in specified format.
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-
         // Create a calendar object that will convert the date and time value in milliseconds to date.
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
 
         String date = "" + calendar.get(Calendar.DAY_OF_MONTH) + "." + calendar.get(Calendar.MONTH) + "." + calendar.get(Calendar.YEAR);
         String time = "" + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND);
-
-        //String testi = formatter.format(time + " " + date);
 
         @SuppressLint("DefaultLocale") String formattedTime = String.format("%02d:%02d:%02d %d.%d.%04d",
                 calendar.get(Calendar.HOUR_OF_DAY),
@@ -92,9 +87,6 @@ class Converter {
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.YEAR));
 
-
-        //return formatter.format(calendar.getTime());
-        //return time + " " + date;
         return formattedTime;
     }
 }

@@ -107,6 +107,7 @@ public class Top5AppsFragment extends Fragment {
 
     protected void setTextViewTexts()
     {
+
         //Nollataan tekstikentät, mikäli tekstien haku epäonnistuu
         top1AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
         top2AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
@@ -114,15 +115,25 @@ public class Top5AppsFragment extends Fragment {
         top4AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
         top5AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
 
-        totalUsageTimeText.setText(totalUsage);
+        if(totalUsage != null)
+        { totalUsageTimeText.setText(totalUsage); }
 
-        top1AppTextView.setText(top1AppInfo);
-        top2AppTextView.setText(top2AppInfo);
-        top3AppTextView.setText(top3AppInfo);
-        top4AppTextView.setText(top4AppInfo);
-        top5AppTextView.setText(top5AppInfo);
+        if(top1AppInfo != null)
+        { top1AppTextView.setText(top1AppInfo); }
 
-        Log.d("Top5 tekstit asetettu", "OK");
+        if(top2AppInfo != null)
+        { top2AppTextView.setText(top2AppInfo); }
+
+        if(top3AppInfo != null)
+        { top3AppTextView.setText(top3AppInfo); }
+
+        if(top4AppInfo != null)
+        { top4AppTextView.setText(top4AppInfo); }
+
+        if(top5AppInfo != null)
+        { top5AppTextView.setText(top5AppInfo); }
+
+        Log.d("Top5 tekstit asetettu", "Most used: OK");
     }
 
     //Metodi, jolla asetetaan drawable -muotoiset iconit näkyviin imagevieweihin
@@ -178,7 +189,7 @@ public class Top5AppsFragment extends Fragment {
             {top5Icon.setImageDrawable(icon5);}
         }
 
-        Log.d("Asetetaan ikonit", "OK");
+        Log.d("Asetetaan ikonit", "Most used: OK");
     }
 
     //Metodi, jolla voi hakea jaetun String -muuttujan
@@ -220,7 +231,7 @@ public class Top5AppsFragment extends Fragment {
     }
 
     // newInstance constructor for creating fragment with arguments
-    public static Top5AppsFragment newInstance(int page, String title) { return new Top5AppsFragment(); }
+    public static Top5AppsFragment newInstance(int position) { return new Top5AppsFragment(); }
 
     //Mikäli sovelluksella on tarvittavat oikeudet, hakee statistiikan. Muussa tapauksessa pyytää tarvittavia oikeuksia.
     private void fillStats() {
@@ -274,9 +285,11 @@ public class Top5AppsFragment extends Fragment {
 
     private void getStats() {
 
+        /*
         Context context = getActivity().getApplicationContext();
         Thread appStatsQueryThread = new AppStatsQueryThread(context);
         appStatsQueryThread.run();
+        */
 
         totalUsage = getSharedPreferences("sharedStats", "totalUsage");
         top1AppInfo = getSharedPreferences("sharedStats", "top1AppInfo");
@@ -323,11 +336,11 @@ public class Top5AppsFragment extends Fragment {
         top5AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
 
         //Nollataan imageviewit
-        top1Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
-        top2Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
-        top3Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
-        top4Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
-        top5Icon.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher_round));
+        top1Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top2Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top3Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top4Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top5Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
 
         //Nollataan kokonaisruutuaika tekstikenttä
         totalUsageTimeText.setText(getResources().getString(R.string.usagerequestfailed_text));

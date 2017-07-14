@@ -105,15 +105,9 @@ class AppStatsQueryThread extends Thread {
         for(UsageStats lUsageStats:listUsageTimeApps){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-                counter++;
 
-                //Hakee applikaation käyttöajan
-                long totalTimeInForeground = lUsageStats.getTotalTimeInForeground();
-
-                //Mikäli appsia on käytetty enemmän kuin minuutti
-                if(timeConverter.convertMillisToMinutes(totalTimeInForeground) > 0 )
-                {
-                    Log.d("Tänään käytetty", aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()) + " yhteensä: " + timeConverter.convertMillisToHoursMinutesSeconds(lUsageStats.getTotalTimeInForeground()));
+                    //Hakee applikaation käyttöajan
+                    long totalTimeInForeground = lUsageStats.getTotalTimeInForeground();
 
                     //Hakee koska appia on viimeksi käytetty
                     long lastTimeUsed = lUsageStats.getLastTimeUsed();
@@ -121,12 +115,20 @@ class AppStatsQueryThread extends Thread {
                     //Tarkastaa mitä appeja on käytetty viimeksi TOP5
                     checkLastUsedApp(lastTimeUsed, lUsageStats.getPackageName());
 
-                    //Tarkastaa TOP5 käytetyimmät appsit
-                    checkMostUsed(aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()),lUsageStats.getPackageName(), lUsageStats.getTotalTimeInForeground());
+                    //Mikäli appsia on käytetty enemmän kuin minuutti
+                    if(timeConverter.convertMillisToMinutes(totalTimeInForeground) > 0 )
+                    {
+                        Log.d("Tänään käytetty", aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()) + " yhteensä: " + timeConverter.convertMillisToHoursMinutesSeconds(lUsageStats.getTotalTimeInForeground()));
 
-                    //Tarkastaa yhteensä appsien käyttämän ajan
-                    calculateTotalTime(lUsageStats.getTotalTimeInForeground(), aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()));
-                }
+                        //Tarkastaa TOP5 käytetyimmät appsit
+                        checkMostUsed(aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()),lUsageStats.getPackageName(), lUsageStats.getTotalTimeInForeground());
+
+                        //Tarkastaa yhteensä appsien käyttämän ajan
+                        calculateTotalTime(lUsageStats.getTotalTimeInForeground(), aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()));
+                    }
+
+                counter++;
+
 
                 //Kun kaikki appsit on käyty läpi
                 if(counter == listUsageTimeApps.size())
@@ -156,11 +158,39 @@ class AppStatsQueryThread extends Thread {
                     String str4 = timeConverter.convertMillisToDate(top4);
                     String str5 = timeConverter.convertMillisToDate(top5);
 
+                    if(top1App != null)
+                    {
+                        top1StringBuilder.append("1. ").append(aStatsManager.getAppLabel(top1App, mContext.getApplicationContext())).append("\r\n").append(str1).append("\r\n");
+                    }
+
+                    if(top2App != null)
+                    {
+                        top2StringBuilder.append("2. ").append(aStatsManager.getAppLabel(top2App, mContext.getApplicationContext())).append("\r\n").append(str2).append("\r\n");
+                    }
+
+                    if(top3App != null)
+                    {
+                        top3StringBuilder.append("3. ").append(aStatsManager.getAppLabel(top3App, mContext.getApplicationContext())).append("\r\n").append(str3).append("\r\n");
+                    }
+
+                    if(top4App != null)
+                    {
+                        top4StringBuilder.append("4. ").append(aStatsManager.getAppLabel(top4App, mContext.getApplicationContext())).append("\r\n").append(str4).append("\r\n");
+                    }
+
+                    if(top5App != null)
+                    {
+                        top5StringBuilder.append("5. ").append(aStatsManager.getAppLabel(top5App, mContext.getApplicationContext())).append("\r\n").append(str5).append("\r\n");
+                    }
+
+                    //Aiheuttaa crashaamisen mikäli ei ole käytetty vielä 5 appia
+                    /*
                     top1StringBuilder.append("1. ").append(aStatsManager.getAppLabel(top1App, mContext.getApplicationContext())).append("\r\n").append(str1).append("\r\n");
                     top2StringBuilder.append("2. ").append(aStatsManager.getAppLabel(top2App, mContext.getApplicationContext())).append("\r\n").append(str2).append("\r\n");
                     top3StringBuilder.append("3. ").append(aStatsManager.getAppLabel(top3App, mContext.getApplicationContext())).append("\r\n").append(str3).append("\r\n");
                     top4StringBuilder.append("4. ").append(aStatsManager.getAppLabel(top4App, mContext.getApplicationContext())).append("\r\n").append(str4).append("\r\n");
                     top5StringBuilder.append("5. ").append(aStatsManager.getAppLabel(top5App, mContext.getApplicationContext())).append("\r\n").append(str5).append("\r\n");
+*/
 
                     String top1LastTimeUsedInfo = top1StringBuilder.toString();
                     String top2LastTimeUsedInfo = top2StringBuilder.toString();
@@ -211,9 +241,9 @@ class AppStatsQueryThread extends Thread {
 
     private void setStartValues()
     {
-        usageStatsUsageTimeApps = null;
-        listUsageTimeApps = null;
-        lUsageStatsList = null;
+        //usageStatsUsageTimeApps = null;
+        //listUsageTimeApps = null;
+        //lUsageStatsList = null;
 
         //Nollataan viimeksi käytetty aika
         top1 = 0;
@@ -397,6 +427,8 @@ class AppStatsQueryThread extends Thread {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void checkLastUsedApp(long lastTimeUsed, String packageName)
     {
+
+
         //Varmistetaan ettei tämä appi tule listalle
         if(lastTimeUsed > top1 && !Objects.equals(packageName, mContext.getApplicationContext().getPackageName()))
         {

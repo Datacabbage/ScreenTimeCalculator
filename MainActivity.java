@@ -1,5 +1,6 @@
 package tuomomees.screentimecalculator;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
@@ -24,6 +25,8 @@ public class MainActivity extends FragmentActivity{
     SwipeRefreshLayout swipeLayout;
 
     Top5AppsFragment top5AppsFragment;
+    LastTimeUsedFragment lastTimeUsedFragment;
+    Thread appStatsQueryThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +39,7 @@ public class MainActivity extends FragmentActivity{
         setContentView(R.layout.activity_main);
 
         top5AppsFragment = new Top5AppsFragment();
+        lastTimeUsedFragment = new LastTimeUsedFragment();
 
         //Alustaa liukupäivityksen käyttöön
         initializeSwipeRefresh();
@@ -45,6 +49,10 @@ public class MainActivity extends FragmentActivity{
 
         //Tarkistaa mm. näytön koon
         checkDisplayStats();
+
+        Context context = getApplicationContext();
+        appStatsQueryThread = new AppStatsQueryThread(context);
+        appStatsQueryThread.run();
 
         //Tekee notification barista läpinäkyvän
         Window w = getWindow(); // in Activity's onCreate() for instance
@@ -63,6 +71,7 @@ public class MainActivity extends FragmentActivity{
                         Log.d("SwipeRefresh", "Päivitys aloitettu");
 
                         refreshFragment(top5AppsFragment);
+                        refreshFragment(lastTimeUsedFragment);
                         swipeLayout.setRefreshing(false);
 
                         String toastRefreshningReady = getResources().getString(R.string.refreshing_ready);
@@ -80,7 +89,7 @@ public class MainActivity extends FragmentActivity{
     }
 
     private class MyPagerAdapter extends FragmentPagerAdapter {
-        private  int NUM_ITEMS = 3;
+        private  int NUM_ITEMS = 2;
 
         MyPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
@@ -97,11 +106,14 @@ public class MainActivity extends FragmentActivity{
         public Fragment getItem(int position) {
             switch (position) {
                 case 0: // Fragment # 0 - This will show FirstFragment
-                    return Top5AppsFragment.newInstance(0, "Page");
+                    //return Top5AppsFragment.newInstance(position);
+                    return top5AppsFragment;
                 case 1: // Fragment # 0 - This will show FirstFragment different title
-                    return LastTimeUsedFragment.newInstance(1, "Page");
+                    //return LastTimeUsedFragment.newInstance(1, "Page");
+                    return lastTimeUsedFragment;
                 case 2: // Fragment # 1 - This will show SecondFragment
-                    return Top5AppsFragment.newInstance(2, "Page");
+                    //return top5AppsFragment;
+                    return null;
                 default:
                     return null;
             }
@@ -111,23 +123,27 @@ public class MainActivity extends FragmentActivity{
         @Override
         public CharSequence getPageTitle(int position) {
 
-            if(position == 0)
-            {
-                return getResources().getString(R.string.top5appspage_title);
+            switch (position) {
+                case 0:
+                    return getResources().getString(R.string.top5appspage_title);
+                case 1:
+                    return getResources().getString(R.string.lastusedpage_title);
+                case 2: 
+                    return getResources().getString(R.string.top5appspage_title);
+                default:
+                    return "Page" + position;
             }
-
-            if(position == 1)
-            {
-                return getResources().getString(R.string.lastusedpage_title);
-            }
-
-            if(position == 2)
-            {
-                return getResources().getString(R.string.top5appspage_title);
-            }
-
-            return "Page" + position;
         }
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+
+        super.onDestroy();
+        //finish();
+        //detachFragment(lastTimeUsedFragment);
+        //detachFragment(top5AppsFragment);
     }
 
     private void checkDisplayStats()
@@ -148,6 +164,12 @@ public class MainActivity extends FragmentActivity{
         Log.d("mActivity", "onResume()");
         //refreshFragment(top5AppsFragment);
         super.onResume();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
     }
 
     //Metodi, jolla voi uudelleenkäynnistää fragmentin, jolloin se luodaan uudelleen

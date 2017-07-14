@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +54,9 @@ public class LastTimeUsedFragment extends Fragment {
         //Alustaa widgetit
         initialize();
 
+        //Alustetaan alkuarvot
+        setStartValues();
+
         //Hakee appien tiedot
         getStats();
 
@@ -84,13 +88,19 @@ public class LastTimeUsedFragment extends Fragment {
 
     public void setTextViewTexts()
     {
-        top1AppTextView.setText(top1AppInfo);
-        top2AppTextView.setText(top2AppInfo);
-        top3AppTextView.setText(top3AppInfo);
-        top4AppTextView.setText(top4AppInfo);
-        top5AppTextView.setText(top5AppInfo);
+        if(top1AppInfo != null)
+        { top1AppTextView.setText(top1AppInfo); }
+        if(top2AppInfo != null)
+        { top2AppTextView.setText(top2AppInfo); }
+        if(top3AppInfo != null)
+        { top3AppTextView.setText(top3AppInfo); }
+        if(top4AppInfo != null)
+        { top4AppTextView.setText(top4AppInfo); }
+        if(top5AppInfo != null)
+        { top5AppTextView.setText(top5AppInfo); }
 
-        totalUsageTimeText.setText(totalUsage);
+        if(totalUsage != null)
+        { totalUsageTimeText.setText(totalUsage); }
     }
 
     public void setIconDrawable()
@@ -185,5 +195,43 @@ public class LastTimeUsedFragment extends Fragment {
         SharedPreferences pref = this.getActivity().getSharedPreferences(sharedPrefTag, MODE_PRIVATE);
 
         return pref.getString(sharedVariableTag, null);
+    }
+
+    protected void setStartValues()
+    {
+
+        //Nollataan pakettien nimet
+        top1Package = null;
+        top2Package = null;
+        top3Package = null;
+        top4Package = null;
+        top5Package = null;
+
+        //Nollataan appsien nimet
+        top1AppInfo = null;
+        top2AppInfo = null;
+        top3AppInfo = null;
+        top4AppInfo = null;
+        top5AppInfo = null;
+
+        //Nollataan tekstikentät
+        top1AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
+        top2AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
+        top3AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
+        top4AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
+        top5AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
+
+        //Nollataan imageviewit
+        top1Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top2Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top3Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top4Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+        top5Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
+
+        //Nollataan kokonaisruutuaika tekstikenttä
+        totalUsageTimeText.setText(getResources().getString(R.string.usagerequestfailed_text));
+
+
+        Log.d("Arvojen nollaus ", "Last Used Fragment: OK");
     }
 }
