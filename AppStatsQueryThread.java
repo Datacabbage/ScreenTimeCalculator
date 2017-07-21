@@ -15,6 +15,7 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -124,7 +125,10 @@ class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedLi
                     cal1.set(Calendar.SECOND, 0);
                     cal1.set(Calendar.MILLISECOND, 0);
 
-                    int dayOfWeek = cal1.get(Calendar.DAY_OF_WEEK_IN_MONTH);
+                    Locale locale;
+                    locale.getCountry();
+                    ca
+                    int dayOfWeek = cal1.get(Calendar.);
                     Log.d("DOW", String.valueOf(dayOfWeek));
 
                     begin = cal1.getTimeInMillis();
