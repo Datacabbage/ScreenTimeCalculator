@@ -69,6 +69,8 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
 
     AppStatsManager appStatsManager;
 
+    Thread appStatsQueryThread;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {super.onCreate(savedInstanceState);}
 
@@ -258,7 +260,7 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
                 setStartValues();
                 getStats();
             }else{
-                requestPermission(); //TODO: testi
+                requestPermission();
             }
         }
     }
@@ -377,11 +379,12 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
 
         setSharedPreference("spinnerselection", "top5appsfragment", item);
 
-        Context context = getActivity().getApplicationContext();
-        Thread appStatsQueryThread = new AppStatsQueryThread(context, item);
+        Context context = getActivity().getApplicationContext(); //TODO: mikäli testi ei onnistu, siirrä threadin aloitus takaisin mainactivityyn
+        //Thread appStatsQueryThread = new AppStatsQueryThread(context, item);
+        appStatsQueryThread = new AppStatsQueryThread(context, item);
         appStatsQueryThread.run();
 
-        Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+        Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show(); //TODO: tee tähän tarvittava stringi
 
     }
 

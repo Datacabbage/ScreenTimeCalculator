@@ -83,12 +83,15 @@ class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedLi
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
+
+            
             //Haetaan nykyinen aikavyöhyke, jotta aikatiedot tulevat oikein
             TimeZone timeZone = TimeZone.getTimeZone("GMT");
 
             //Otetaan tämän päivän aikatiedot millisekunteina
-            Calendar cal1 = Calendar.getInstance(timeZone);
-            //Calendar cal1 = Calendar.getInstance();
+            //Calendar cal1 = Calendar.getInstance(timeZone);
+            //Calendar cal1 = Calendar.getInstance(locale);
+            Calendar cal1 = Calendar.getInstance();
 
             long begin = 0;
             long end = 0;
@@ -124,13 +127,11 @@ class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedLi
                     cal1.set(Calendar.MINUTE, 0);
                     cal1.set(Calendar.SECOND, 0);
                     cal1.set(Calendar.MILLISECOND, 0);
-
-                    Locale locale;
-                    locale.getCountry();
-                    ca
-                    int dayOfWeek = cal1.get(Calendar.);
+                    
+                    int dayOfWeek = cal1.get(Calendar.DAY_OF_WEEK);
                     Log.d("DOW", String.valueOf(dayOfWeek));
 
+                    cal1.add(Calendar.DAY_OF_WEEK,  -dayOfWeek);
                     begin = cal1.getTimeInMillis();
 
                     cal1.add(Calendar.DAY_OF_WEEK, 7);
@@ -306,6 +307,7 @@ class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedLi
 
         totalUsageTimeMillis = totalUsageTimeMillis + usageTime;
         totalUsageTimeMinutes = timeConverter.convertMillisToMinutes(totalUsageTimeMillis);
+
 
         totalUsageStringBuilder.append(mContext.getResources().getString(R.string.totalusage_text)).append("\r\n").append(timeConverter.convertMillisToHoursMinutesSeconds(totalUsageTimeMillis));
         totalUsage = totalUsageStringBuilder.toString();
