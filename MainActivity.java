@@ -2,6 +2,7 @@ package tuomomees.screentimecalculator;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -11,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -50,13 +52,21 @@ public class MainActivity extends FragmentActivity{
         //Tarkistaa mm. näytön koon
         checkDisplayStats();
 
-        Context context = getApplicationContext();
-        appStatsQueryThread = new AppStatsQueryThread(context);
-        appStatsQueryThread.run();
+        //Alustaa Threadin ja threadhandlerin
+        initializeThreads();
 
         //Tekee notification barista läpinäkyvän
         Window w = getWindow(); // in Activity's onCreate() for instance
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+    }
+
+    public void initializeThreads()
+    {
+        /*
+        Context context = getApplicationContext();
+        appStatsQueryThread = new AppStatsQueryThread(context);
+        appStatsQueryThread.run();
+        */
     }
 
     //Metodi, joka alustaa käyttöön SwipeRefreshin
@@ -72,8 +82,15 @@ public class MainActivity extends FragmentActivity{
 
                         refreshFragment(top5AppsFragment);
                         refreshFragment(lastTimeUsedFragment);
-                        swipeLayout.setRefreshing(false);
 
+                        /*
+                        if(appStatsQueryThread.isAlive()){ appStatsQueryThread.interrupt(); }
+                        appStatsQueryThread = new Thread();
+                        appStatsQueryThread.start();
+                        appStatsQueryThread.run();
+                        */
+
+                        swipeLayout.setRefreshing(false);
                         String toastRefreshningReady = getResources().getString(R.string.refreshing_ready);
                         Toast.makeText(MainActivity.this, toastRefreshningReady , Toast.LENGTH_SHORT).show();
                     }

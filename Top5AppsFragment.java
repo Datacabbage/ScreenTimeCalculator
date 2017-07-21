@@ -18,14 +18,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
 
-public class Top5AppsFragment extends Fragment {
+public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSelectedListener{
 
     private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 100;
 
@@ -216,6 +222,17 @@ public class Top5AppsFragment extends Fragment {
         top3Icon = (ImageView) view.findViewById(R.id.imageViewTop3);
         top4Icon = (ImageView) view.findViewById(R.id.imageViewTop4);
         top5Icon = (ImageView) view.findViewById(R.id.imageViewTop5);
+
+        //Alustetaan Spinner -pudotavalikko
+        Spinner spinner = (Spinner) view.findViewById(R.id.spinnerQuerySelect);
+        spinner.setOnItemSelectedListener(this);
+
+        //Luodaan adapteri spinnerille
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.queries_array, android.R.layout.simple_spinner_item);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
     }
 
     //Metodi, jolla voi hakea tarvittavien applikaatioiden app-ikonit paketin nimen avulla
@@ -241,7 +258,7 @@ public class Top5AppsFragment extends Fragment {
                 setStartValues();
                 getStats();
             }else{
-                requestPermission();
+                requestPermission(); //TODO: testi
             }
         }
     }
@@ -350,6 +367,27 @@ public class Top5AppsFragment extends Fragment {
         totalUsageTimeMillis = 0;
 
         Log.d("Arvojen nollaus ", "Most Used Fragment: OK");
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+        // On selecting a spinner item
+        String item = parent.getItemAtPosition(position).toString();
+
+        setSharedPreference("spinnerselection", "top5appsfragment", item);
+
+        Context context = getActivity().getApplicationContext();
+        Thread appStatsQueryThread = new AppStatsQueryThread(context, item);
+        appStatsQueryThread.run();
+
+        Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 
         /*
