@@ -30,8 +30,10 @@ public class AppStatsManager extends AppCompatActivity {
             applicationName = (String) packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA));
 
         } catch (PackageManager.NameNotFoundException e) {
-            Toast toast = Toast.makeText(this, "error in getting name", Toast.LENGTH_SHORT);
-            toast.show();
+
+            //Aiheuttaa errorin, mikäli käytössä viikottainen haku
+            //Toast toast = Toast.makeText(this, "error in getting name", Toast.LENGTH_SHORT);
+            //toast.show();
             e.printStackTrace();
         }
 

@@ -26,7 +26,7 @@ import static android.content.Context.MODE_PRIVATE;
  * Luokan on luonut tuomo päivämäärällä 11.7.2017.
  */
 
-class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedListener{
+class AppStatsQueryThread extends Thread{
 
     //TESTI
     private Map<String, UsageStats> usageStatsUsageTimeApps;
@@ -66,20 +66,20 @@ class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedLi
     private long top1 = 0, top2 = 0, top3 = 0, top4 = 0, top5 = 0;
     private String top1App = null, top2App = null, top3App = null, top4App = null, top5App = null;
 
-    AppStatsQueryThread(Context context, String qSelect){
+    AppStatsQueryThread(Context context){
         mContext = context;
-        querySelection = qSelect;
+        //querySelection = qSelect;
     }
 
     public void run() {
 
         Log.d("Käynnistetään Thread", "QueryThread: OK");
 
-        //Tarvitsee API 22
-        final UsageStatsManager lUsageStatsManager = (UsageStatsManager) mContext.getSystemService(Context.USAGE_STATS_SERVICE);
-
         //Asetetaan alkuarvot
         setStartValues();
+
+        //Tarvitsee API 22
+        final UsageStatsManager lUsageStatsManager = (UsageStatsManager) mContext.getSystemService(Context.USAGE_STATS_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
@@ -91,16 +91,14 @@ class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedLi
             //Otetaan tämän päivän aikatiedot millisekunteina
             //Calendar cal1 = Calendar.getInstance(timeZone);
             //Calendar cal1 = Calendar.getInstance(locale);
-            Calendar cal1 = Calendar.getInstance();
+
 
             long begin = 0;
             long end = 0;
 
 
-            if(querySelection == null)
-            {
-                querySelection = getSharedPreferences("spinnerselection", "top5appsfragment");
-            }
+            querySelection = getSharedPreferences("spinnerselection", "top5appsfragment");
+
 
 
             if(querySelection != null)
@@ -108,6 +106,7 @@ class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedLi
                 Log.d("query", querySelection);
                 if(querySelection.equals("Daily"))
                 {
+                    Calendar cal1 = Calendar.getInstance();
                     cal1.set(Calendar.HOUR_OF_DAY, 0);
                     cal1.set(Calendar.MINUTE, 0);
                     cal1.set(Calendar.SECOND, 0);
@@ -123,6 +122,7 @@ class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedLi
 
                 if(querySelection.equals("Weekly"))
                 {
+                    Calendar cal1 = Calendar.getInstance();
                     cal1.set(Calendar.HOUR_OF_DAY, 0);
                     cal1.set(Calendar.MINUTE, 0);
                     cal1.set(Calendar.SECOND, 0);
@@ -131,37 +131,45 @@ class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedLi
                     int dayOfWeek = cal1.get(Calendar.DAY_OF_WEEK);
                     Log.d("DOW", String.valueOf(dayOfWeek));
 
-                    cal1.add(Calendar.DAY_OF_WEEK,  -dayOfWeek);
-                    begin = cal1.getTimeInMillis();
-
-                    cal1.add(Calendar.DAY_OF_WEEK, 7);
                     end = cal1.getTimeInMillis();
+
+                    cal1.set(Calendar.DAY_OF_WEEK, 0);
+
+                    begin = cal1.getTimeInMillis();
                 }
 
                 if(querySelection.equals("Monthly"))
                 {
+                    Calendar cal1 = Calendar.getInstance();
                     cal1.set(Calendar.HOUR_OF_DAY, 0);
                     cal1.set(Calendar.MINUTE, 0);
                     cal1.set(Calendar.SECOND, 0);
                     cal1.set(Calendar.MILLISECOND, 0);
 
-                    begin = cal1.getTimeInMillis();
-
-                    cal1.add(Calendar.MONTH, 1);
+                    int currentDOM = cal1.get(Calendar.DAY_OF_MONTH);
+                    Log.d("DOM", String.valueOf(currentDOM));
                     end = cal1.getTimeInMillis();
+
+                    cal1.set(Calendar.DAY_OF_MONTH, 0);
+
+                    begin = cal1.getTimeInMillis();
                 }
 
                 if(querySelection.equals("Yearly"))
                 {
+                    Calendar cal1 = Calendar.getInstance();
                     cal1.set(Calendar.HOUR_OF_DAY, 0);
                     cal1.set(Calendar.MINUTE, 0);
                     cal1.set(Calendar.SECOND, 0);
                     cal1.set(Calendar.MILLISECOND, 0);
 
-                    begin = cal1.getTimeInMillis();
-
-                    cal1.add(Calendar.YEAR, 1);
+                    int currentDOY = cal1.get(Calendar.DAY_OF_YEAR);
+                    Log.d("DOY", String.valueOf(currentDOY));
                     end = cal1.getTimeInMillis();
+
+                    cal1.set(Calendar.DAY_OF_YEAR, 0);
+
+                    begin = cal1.getTimeInMillis();
                 }
 
             }
@@ -198,6 +206,8 @@ class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedLi
                         //Tarkastaa TOP5 käytetyimmät appsit
                         checkMostUsed(aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()),lUsageStats.getPackageName(), lUsageStats.getTotalTimeInForeground());
 
+
+                        //TODO:
                         //Tarkastaa yhteensä appsien käyttämän ajan
                         calculateTotalTime(lUsageStats.getTotalTimeInForeground(), aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()));
                     }
@@ -505,7 +515,12 @@ class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedLi
     private void checkLastUsedApp(long lastTimeUsed, String packageName)
     {
 
-        String appName = aStatsManager.getAppLabel(packageName, mContext);
+        String appName = "Applikaation nimi";
+
+        if(packageName != null)
+        {
+            appName = aStatsManager.getAppLabel(packageName, mContext);
+        }
 
         //Varmistetaan ettei tämä appi tule listalle
         if(lastTimeUsed > top1 && !Objects.equals(packageName, mContext.getApplicationContext().getPackageName()) && !appName.contains("launcher"))
@@ -571,13 +586,4 @@ class AppStatsQueryThread extends Thread implements AdapterView.OnItemSelectedLi
         return pref.getString(sharedVariableTag, null);
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
 }

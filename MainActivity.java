@@ -62,11 +62,10 @@ public class MainActivity extends FragmentActivity{
 
     public void initializeThreads()
     {
-        /*
-        Context context = getApplicationContext();
+        //Context context = getApplicationContext();
+        Context context = this.getApplicationContext();
         appStatsQueryThread = new AppStatsQueryThread(context);
         appStatsQueryThread.run();
-        */
     }
 
     //Metodi, joka alustaa käyttöön SwipeRefreshin
@@ -83,12 +82,8 @@ public class MainActivity extends FragmentActivity{
                         refreshFragment(top5AppsFragment);
                         refreshFragment(lastTimeUsedFragment);
 
-                        /*
-                        if(appStatsQueryThread.isAlive()){ appStatsQueryThread.interrupt(); }
-                        appStatsQueryThread = new Thread();
-                        appStatsQueryThread.start();
+                        //Ajetaan Threadin runnable uudelleen
                         appStatsQueryThread.run();
-                        */
 
                         swipeLayout.setRefreshing(false);
                         String toastRefreshningReady = getResources().getString(R.string.refreshing_ready);
@@ -142,11 +137,14 @@ public class MainActivity extends FragmentActivity{
 
             switch (position) {
                 case 0:
-                    return getResources().getString(R.string.top5appspage_title);
+                    // getResources().getString(R.string.top5appspage_title);
+                    return "Shaiba";
                 case 1:
-                    return getResources().getString(R.string.lastusedpage_title);
+                    //return getResources().getString(R.string.lastusedpage_title);
+                return "Shaiba";
                 case 2: 
-                    return getResources().getString(R.string.top5appspage_title);
+                    //return getResources().getString(R.string.top5appspage_title);
+                return "Shaiba";
                 default:
                     return "Page" + position;
             }

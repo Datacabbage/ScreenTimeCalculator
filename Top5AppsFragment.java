@@ -70,6 +70,7 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
     AppStatsManager appStatsManager;
 
     Thread appStatsQueryThread;
+    String item = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {super.onCreate(savedInstanceState);}
@@ -368,6 +369,9 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
         totalUsageTimeMinutes = 0;
         totalUsageTimeMillis = 0;
 
+        //Nollataan spinnervalikon muuttuja
+        item = null;
+
         Log.d("Arvojen nollaus ", "Most Used Fragment: OK");
     }
 
@@ -375,17 +379,11 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
         // On selecting a spinner item
-        String item = parent.getItemAtPosition(position).toString();
+        item = parent.getItemAtPosition(position).toString();
 
         setSharedPreference("spinnerselection", "top5appsfragment", item);
 
-        Context context = getActivity().getApplicationContext(); //TODO: mikäli testi ei onnistu, siirrä threadin aloitus takaisin mainactivityyn
-        //Thread appStatsQueryThread = new AppStatsQueryThread(context, item);
-        appStatsQueryThread = new AppStatsQueryThread(context, item);
-        appStatsQueryThread.run();
-
-        Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show(); //TODO: tee tähän tarvittava stringi
-
+        //Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_SHORT).show(); //TODO: tee tähän tarvittava stringi
     }
 
     @Override
