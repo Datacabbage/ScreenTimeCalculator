@@ -13,6 +13,7 @@ import android.widget.Toast;
  */
 
 //ÄLÄ KÄYTÄ TOASTIA TAI LOGIA TÄSSÄ LUOKASSA
+    //
 
 public class AppStatsManager extends AppCompatActivity {
 
