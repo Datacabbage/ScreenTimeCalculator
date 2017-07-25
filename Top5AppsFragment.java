@@ -160,7 +160,7 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
         //Asetetaan TOP5 appsien iconit näkymään, mikäli arvot eivät ole NULL
         if(top1Package != null)
         {
-            icon1 = getIconDrawable(top1Package);
+            icon1 = appStatsManager.getIconDrawable(top1Package);
 
             if(icon1 != null)
             {top1Icon.setImageDrawable(icon1);}
@@ -168,7 +168,7 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
 
         if(top2Package != null)
         {
-            icon2 = getIconDrawable(top2Package);
+            icon2 = appStatsManager.getIconDrawable(top2Package);
 
             if(icon2 != null)
             {top2Icon.setImageDrawable(icon2);}
@@ -176,7 +176,7 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
 
         if(top3Package != null)
         {
-            icon3 = getIconDrawable(top3Package);
+            icon3 = appStatsManager.getIconDrawable(top3Package);
 
             if(icon3 != null)
             {top3Icon.setImageDrawable(icon3);}
@@ -184,7 +184,7 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
 
         if(top4Package != null)
         {
-            icon4 = getIconDrawable(top4Package);
+            icon4 = appStatsManager.getIconDrawable(top4Package);
 
             if(icon4 != null)
             {top4Icon.setImageDrawable(icon4);}
@@ -192,7 +192,7 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
 
         if(top5Package != null)
         {
-            icon5 = getIconDrawable(top5Package);
+            icon5 = appStatsManager.getIconDrawable(top5Package);
 
             if(icon5 != null)
             {top5Icon.setImageDrawable(icon5);}
@@ -225,6 +225,9 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
         top3Icon = (ImageView) view.findViewById(R.id.imageViewTop3);
         top4Icon = (ImageView) view.findViewById(R.id.imageViewTop4);
         top5Icon = (ImageView) view.findViewById(R.id.imageViewTop5);
+
+        //Alustetaan metodi, jolla haetaan paketin nimi ja kuvake (tarvitsee contextin)
+        appStatsManager = new AppStatsManager(getActivity().getApplicationContext());
 
         //Alustetaan Spinner -pudotavalikko
         Spinner spinner = (Spinner) view.findViewById(R.id.spinnerQuerySelect);

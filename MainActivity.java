@@ -137,14 +137,11 @@ public class MainActivity extends FragmentActivity{
 
             switch (position) {
                 case 0:
-                    // getResources().getString(R.string.top5appspage_title);
-                    return "Shaiba";
+                    return getResources().getString(R.string.top5appspage_title);
                 case 1:
-                    //return getResources().getString(R.string.lastusedpage_title);
-                return "Shaiba";
+                    return getResources().getString(R.string.lastusedpage_title);
                 case 2: 
-                    //return getResources().getString(R.string.top5appspage_title);
-                return "Shaiba";
+                    return getResources().getString(R.string.top5appspage_title);
                 default:
                     return "Page" + position;
             }

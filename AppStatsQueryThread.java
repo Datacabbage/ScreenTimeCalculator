@@ -50,7 +50,8 @@ class AppStatsQueryThread extends Thread{
     //Kokonaiskäyttöaika
     private String totalUsage = null;
 
-    private AppStatsManager aStatsManager = new AppStatsManager();
+    //private AppStatsManager aStatsManager = new AppStatsManager();
+    private AppStatsManager aStatsManager;
     private Converter timeConverter = new Converter();
 
     private int counter = 0;
@@ -68,6 +69,7 @@ class AppStatsQueryThread extends Thread{
 
     AppStatsQueryThread(Context context){
         mContext = context;
+        aStatsManager = new AppStatsManager(context);
         //querySelection = qSelect;
     }
 
@@ -98,8 +100,6 @@ class AppStatsQueryThread extends Thread{
 
 
             querySelection = getSharedPreferences("spinnerselection", "top5appsfragment");
-
-
 
             if(querySelection != null)
             {

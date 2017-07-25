@@ -41,6 +41,8 @@ public class LastTimeUsedFragment extends Fragment {
     String totalUsage = null;
     TextView totalUsageTimeText;
 
+    AppStatsManager appStatsManager;
+
     @Override
     public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
 
@@ -115,7 +117,7 @@ public class LastTimeUsedFragment extends Fragment {
         //Asetetaan TOP5 appsien iconit näkymään, mikäli arvot eivät ole NULL
         if(top1Package != null)
         {
-            icon1 = getIconDrawable(top1Package);
+            icon1 = appStatsManager.getIconDrawable(top1Package);
 
             if(icon1 != null)
             {top1Icon.setImageDrawable(icon1);}
@@ -123,7 +125,7 @@ public class LastTimeUsedFragment extends Fragment {
 
         if(top2Package != null)
         {
-            icon2 = getIconDrawable(top2Package);
+            icon2 = appStatsManager.getIconDrawable(top2Package);
 
             if(icon2 != null)
             {top2Icon.setImageDrawable(icon2);}
@@ -131,7 +133,7 @@ public class LastTimeUsedFragment extends Fragment {
 
         if(top3Package != null)
         {
-            icon3 = getIconDrawable(top3Package);
+            icon3 = appStatsManager.getIconDrawable(top3Package);
 
             if(icon3 != null)
             {top3Icon.setImageDrawable(icon3);}
@@ -139,7 +141,7 @@ public class LastTimeUsedFragment extends Fragment {
 
         if(top4Package != null)
         {
-            icon4 = getIconDrawable(top4Package);
+            icon4 = appStatsManager.getIconDrawable(top4Package);
 
             if(icon4 != null)
             {top4Icon.setImageDrawable(icon4);}
@@ -147,7 +149,7 @@ public class LastTimeUsedFragment extends Fragment {
 
         if(top5Package != null)
         {
-            icon5 = getIconDrawable(top5Package);
+            icon5 = appStatsManager.getIconDrawable(top5Package);
 
             if(icon5 != null)
             {top5Icon.setImageDrawable(icon5);}
@@ -182,6 +184,8 @@ public class LastTimeUsedFragment extends Fragment {
         top3Icon = (ImageView) view.findViewById(R.id.imageViewTop3App);
         top4Icon = (ImageView) view.findViewById(R.id.imageViewTop4App);
         top5Icon = (ImageView) view.findViewById(R.id.imageViewTop5App);
+
+        appStatsManager = new AppStatsManager(getActivity().getApplicationContext());
     }
 
     // newInstance constructor for creating fragment with arguments

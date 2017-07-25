@@ -12,15 +12,21 @@ import android.widget.Toast;
  * Luokan on luonut tuomo päivämäärällä 6.6.2017.
  */
 
+//ÄLÄ KÄYTÄ TOASTIA TAI LOGIA TÄSSÄ LUOKASSA
+
 public class AppStatsManager extends AppCompatActivity {
 
+    //TODO: tähän tarvitaan Stringi
     String applicationName = "Noutaminen ei onnistunut";
+    Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+    AppStatsManager(Context context)
+    { mContext = context; }
     //Metodi, jolla paketin nimen avulla voi hakea applikaation labelin
     public String getAppLabel(String packageName, Context context)
     {
@@ -41,15 +47,15 @@ public class AppStatsManager extends AppCompatActivity {
     }
 
     //Metodi, jolla voi hakea tarvittavien applikaatioiden app-ikonit paketin nimen avulla
-    protected Drawable getIconDrawable(String packageName, Context context) {
+    protected Drawable getIconDrawable(String packageName) {
         Drawable icon;
 
-        PackageManager packageManager = context.getPackageManager();
+        PackageManager packageManager = mContext.getPackageManager();
         try {
             icon = packageManager.getApplicationIcon(packageName);
         } catch (PackageManager.NameNotFoundException e) {
-            Toast toast = Toast.makeText(this, "error in getting icon", Toast.LENGTH_SHORT);
-            toast.show();
+            //Toast toast = Toast.makeText(this, "error in getting icon", Toast.LENGTH_SHORT);
+            //toast.show();
             icon = ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null);
             e.printStackTrace();
         }
