@@ -6,14 +6,12 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 /**
  * Luokan on luonut tuomo päivämäärällä 6.6.2017.
  */
 
 //ÄLÄ KÄYTÄ TOASTIA TAI LOGIA TÄSSÄ LUOKASSA
-    //
 
 public class AppStatsManager extends AppCompatActivity {
 

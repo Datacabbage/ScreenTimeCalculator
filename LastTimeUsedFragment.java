@@ -1,7 +1,6 @@
 package tuomomees.screentimecalculator;
 
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import static android.content.Context.MODE_PRIVATE;
 
 /**
@@ -45,7 +45,6 @@ public class LastTimeUsedFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
-
 
     // Inflate the view for the fragment based on layout XML
     @Override
@@ -156,18 +155,6 @@ public class LastTimeUsedFragment extends Fragment {
         }
     }
 
-    //Metodi, jolla voi hakea tarvittavien applikaatioiden app-ikonit paketin nimen avulla
-    protected Drawable getIconDrawable(String packageName) {
-        Drawable icon = null;
-        try {
-            icon = getActivity().getPackageManager().getApplicationIcon(packageName);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return icon;
-    }
-
     public void initialize()
     {
         //Alustetaan TextViewit
@@ -234,7 +221,6 @@ public class LastTimeUsedFragment extends Fragment {
 
         //Nollataan kokonaisruutuaika tekstikenttä
         totalUsageTimeText.setText(getResources().getString(R.string.usagerequestfailed_text));
-
 
         Log.d("Arvojen nollaus ", "Last Used Fragment: OK");
     }

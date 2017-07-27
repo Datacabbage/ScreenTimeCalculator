@@ -7,10 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -85,10 +81,14 @@ class AppStatsQueryThread extends Thread{
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-
-            
             //Haetaan nykyinen aikavyöhyke, jotta aikatiedot tulevat oikein
             TimeZone timeZone = TimeZone.getTimeZone("GMT");
+            //Locale current = Locale.setDefault(Locale.getDefault().getCountry());
+
+
+            //Hakee localen nykyisestä käyttökielestä
+            String locale = Locale.getDefault().getCountry();
+            Log.d("Locale", String.valueOf(locale));
 
             //Otetaan tämän päivän aikatiedot millisekunteina
             //Calendar cal1 = Calendar.getInstance(timeZone);
@@ -97,7 +97,6 @@ class AppStatsQueryThread extends Thread{
 
             long begin = 0;
             long end = 0;
-
 
             querySelection = getSharedPreferences("spinnerselection", "top5appsfragment");
 
@@ -116,24 +115,31 @@ class AppStatsQueryThread extends Thread{
                     //Lisätään yksi päivä ja otetaan ylös millisekunteina
                     cal1.add(Calendar.DAY_OF_YEAR, 1);
                     //Lisätään sekunti, jotta ohjelma saa hieman pelivaraa lagien varalta
-                    cal1.add(Calendar.SECOND, 1);
+                    cal1.add(Calendar.SECOND, 0);
                     end = cal1.getTimeInMillis();
                 }
 
                 if(querySelection.equals("Weekly"))
                 {
                     Calendar cal1 = Calendar.getInstance();
+
                     cal1.set(Calendar.HOUR_OF_DAY, 0);
                     cal1.set(Calendar.MINUTE, 0);
                     cal1.set(Calendar.SECOND, 0);
                     cal1.set(Calendar.MILLISECOND, 0);
+
+                    Log.d("getFirstDayOfWeek", String.valueOf(Calendar.getInstance().getFirstDayOfWeek()));
                     
                     int dayOfWeek = cal1.get(Calendar.DAY_OF_WEEK);
                     Log.d("DOW", String.valueOf(dayOfWeek));
 
                     end = cal1.getTimeInMillis();
 
-                    cal1.set(Calendar.DAY_OF_WEEK, 0);
+                    //cal1.add(Calendar.DAY_OF_WEEK, -dayOfWeek);
+                    //cal1.set(Calendar.DAY_OF_WEEK, 0);
+
+                    //cal1.set(Calendar.DAY_OF_WEEK, Calendar.getInstance().getFirstDayOfWeek());
+                    cal1.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY); //TODO: tee tähän asetus, jolla voi valita aloitusviikonpäivän
 
                     begin = cal1.getTimeInMillis();
                 }
@@ -167,7 +173,8 @@ class AppStatsQueryThread extends Thread{
                     Log.d("DOY", String.valueOf(currentDOY));
                     end = cal1.getTimeInMillis();
 
-                    cal1.set(Calendar.DAY_OF_YEAR, 0);
+                    cal1.set(Calendar.MONTH, 1);
+                    cal1.set(Calendar.DAY_OF_MONTH, 1);
 
                     begin = cal1.getTimeInMillis();
                 }

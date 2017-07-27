@@ -5,7 +5,6 @@ import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,9 +23,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -116,7 +112,6 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
 
     protected void setTextViewTexts()
     {
-
         //Nollataan tekstikentät, mikäli tekstien haku epäonnistuu
         top1AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
         top2AppTextView.setText(getResources().getString(R.string.usagerequestfailed_text));
@@ -239,18 +234,6 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-    }
-
-    //Metodi, jolla voi hakea tarvittavien applikaatioiden app-ikonit paketin nimen avulla
-    protected Drawable getIconDrawable(String packageName) {
-        Drawable icon = null;
-        try {
-            icon = getActivity().getPackageManager().getApplicationIcon(packageName);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        return icon;
     }
 
     // newInstance constructor for creating fragment with arguments
@@ -425,6 +408,20 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
         {top5AppTextView.setText(top5AppInfo);}
 
         Log.d("Top5 tekstit asetettu", "OK");
+    }
+    */
+
+            /*
+    //Metodi, jolla voi hakea tarvittavien applikaatioiden app-ikonit paketin nimen avulla
+    protected Drawable getIconDrawable(String packageName) {
+        Drawable icon = null;
+        try {
+            icon = getActivity().getPackageManager().getApplicationIcon(packageName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return icon;
     }
     */
 }
