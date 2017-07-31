@@ -11,10 +11,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -46,8 +44,7 @@ class AppStatsQueryThread extends Thread{
     //Kokonaiskäyttöaika
     private String totalUsage = null;
 
-    //private AppStatsManager aStatsManager = new AppStatsManager();
-    private AppStatsManager aStatsManager;
+     private AppStatsManager aStatsManager;
     private Converter timeConverter = new Converter();
 
     private int counter = 0;
@@ -66,7 +63,6 @@ class AppStatsQueryThread extends Thread{
     AppStatsQueryThread(Context context){
         mContext = context;
         aStatsManager = new AppStatsManager(context);
-        //querySelection = qSelect;
     }
 
     public void run() {
@@ -81,19 +77,9 @@ class AppStatsQueryThread extends Thread{
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-            //Haetaan nykyinen aikavyöhyke, jotta aikatiedot tulevat oikein
-            TimeZone timeZone = TimeZone.getTimeZone("GMT");
-            //Locale current = Locale.setDefault(Locale.getDefault().getCountry());
-
-
             //Hakee localen nykyisestä käyttökielestä
-            String locale = Locale.getDefault().getCountry();
-            Log.d("Locale", String.valueOf(locale));
-
-            //Otetaan tämän päivän aikatiedot millisekunteina
-            //Calendar cal1 = Calendar.getInstance(timeZone);
-            //Calendar cal1 = Calendar.getInstance(locale);
-
+            //String locale = Locale.getDefault().getCountry();
+            //Log.d("Locale", String.valueOf(locale));
 
             long begin = 0;
             long end = 0;
@@ -103,23 +89,23 @@ class AppStatsQueryThread extends Thread{
             if(querySelection != null)
             {
                 Log.d("query", querySelection);
-                if(querySelection.equals("Daily"))
+                if(querySelection.equals(mContext.getResources().getString(R.string.daily_text)))
                 {
                     Calendar cal1 = Calendar.getInstance();
                     cal1.set(Calendar.HOUR_OF_DAY, 0);
                     cal1.set(Calendar.MINUTE, 0);
-                    cal1.set(Calendar.SECOND, 0);
+                    cal1.set(Calendar.SECOND, 1);
                     cal1.set(Calendar.MILLISECOND, 0);
 
                     begin = cal1.getTimeInMillis();
                     //Lisätään yksi päivä ja otetaan ylös millisekunteina
                     cal1.add(Calendar.DAY_OF_YEAR, 1);
                     //Lisätään sekunti, jotta ohjelma saa hieman pelivaraa lagien varalta
-                    cal1.add(Calendar.SECOND, 0);
+                    cal1.set(Calendar.SECOND, 0);
                     end = cal1.getTimeInMillis();
                 }
 
-                if(querySelection.equals("Weekly"))
+                if(querySelection.equals(mContext.getResources().getString(R.string.weekly_text)))
                 {
                     Calendar cal1 = Calendar.getInstance();
 
@@ -144,7 +130,7 @@ class AppStatsQueryThread extends Thread{
                     begin = cal1.getTimeInMillis();
                 }
 
-                if(querySelection.equals("Monthly"))
+                if(querySelection.equals(mContext.getResources().getString(R.string.monthly_text)))
                 {
                     Calendar cal1 = Calendar.getInstance();
                     cal1.set(Calendar.HOUR_OF_DAY, 0);
@@ -156,12 +142,12 @@ class AppStatsQueryThread extends Thread{
                     Log.d("DOM", String.valueOf(currentDOM));
                     end = cal1.getTimeInMillis();
 
-                    cal1.set(Calendar.DAY_OF_MONTH, 0);
+                    cal1.set(Calendar.DAY_OF_MONTH, 1);
 
                     begin = cal1.getTimeInMillis();
                 }
 
-                if(querySelection.equals("Yearly"))
+                if(querySelection.equals(mContext.getResources().getString(R.string.yearly_text)))
                 {
                     Calendar cal1 = Calendar.getInstance();
                     cal1.set(Calendar.HOUR_OF_DAY, 0);
@@ -195,7 +181,6 @@ class AppStatsQueryThread extends Thread{
         for(UsageStats lUsageStats:listUsageTimeApps){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-
                     //Hakee applikaation käyttöajan
                     long totalTimeInForeground = lUsageStats.getTotalTimeInForeground();
 
@@ -213,14 +198,12 @@ class AppStatsQueryThread extends Thread{
                         //Tarkastaa TOP5 käytetyimmät appsit
                         checkMostUsed(aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()),lUsageStats.getPackageName(), lUsageStats.getTotalTimeInForeground());
 
-
                         //TODO:
                         //Tarkastaa yhteensä appsien käyttämän ajan
                         calculateTotalTime(lUsageStats.getTotalTimeInForeground(), aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()));
                     }
 
                 counter++;
-
 
                 //Kun kaikki appsit on käyty läpi
                 if(counter == listUsageTimeApps.size())
@@ -377,6 +360,39 @@ class AppStatsQueryThread extends Thread{
         totalUsageTimeMinutes = 0;
         totalUsageTimeMillis = 0;
         totalUsage = null;
+
+        counter = 0;
+        counter2 = 0;
+
+
+        //Nollataan jaetut String -muuttujat
+        setSharedPreference("sharedStats", "totalUsage", "empty");
+        setSharedPreference("sharedStats", "top1AppInfo", "empty");
+        setSharedPreference("sharedStats", "top2AppInfo", "empty");
+        setSharedPreference("sharedStats", "top3AppInfo", "empty");
+        setSharedPreference("sharedStats", "top4AppInfo", "empty");
+        setSharedPreference("sharedStats", "top5AppInfo", "empty");
+
+        setSharedPreference("sharedStats", "top1AppPackage", null);
+        setSharedPreference("sharedStats", "top2AppPackage", null);
+        setSharedPreference("sharedStats", "top3AppPackage", null);
+        setSharedPreference("sharedStats", "top4AppPackage", null);
+        setSharedPreference("sharedStats", "top5AppPackage", null);
+
+        setSharedPreference("sharedStats", "top1LastUsed", "empty");
+        setSharedPreference("sharedStats", "top2LastUsed", "empty");
+        setSharedPreference("sharedStats", "top3LastUsed", "empty");
+        setSharedPreference("sharedStats", "top4LastUsed", "empty");
+        setSharedPreference("sharedStats", "top5LastUsed", "empty");
+
+        setSharedPreference("sharedStats", "top1LastUsedPackage", null);
+        setSharedPreference("sharedStats", "top2LastUsedPackage", null);
+        setSharedPreference("sharedStats", "top3LastUsedPackage", null);
+        setSharedPreference("sharedStats", "top4LastUsedPackage", null);
+        setSharedPreference("sharedStats", "top5LastUsedPackage", null);
+
+        //setSharedPreference("spinnerselection", "top5appsfragment", "Daily");
+
 
         Log.d("Arvojen nollaus ", "Thread: OK");
     }

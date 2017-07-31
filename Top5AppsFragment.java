@@ -93,7 +93,7 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
         setTextViewTexts();
 
         //Asettaa Top5 appsien ikonit näkyviin
-        setIconDrawable();
+        setIconDrawable(); //CRASH
 
         //Palauttaa näkymän, joka piirretään näytölle
         return view;
@@ -149,8 +149,6 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
         top3Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
         top4Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
         top5Icon.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.mipmap.ic_launcher_round, null));
-
-        Context context = getContext().getApplicationContext();
 
         //Asetetaan TOP5 appsien iconit näkymään, mikäli arvot eivät ole NULL
         if(top1Package != null)
@@ -289,7 +287,7 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
         return mode == AppOpsManager.MODE_ALLOWED;
     }
 
-    private void getStats() {
+    protected void getStats() {
 
         /*
         Context context = getActivity().getApplicationContext();

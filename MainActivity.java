@@ -2,8 +2,6 @@ package tuomomees.screentimecalculator;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -12,7 +10,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -62,10 +59,15 @@ public class MainActivity extends FragmentActivity{
 
     public void initializeThreads()
     {
-        //Context context = getApplicationContext();
         Context context = this.getApplicationContext();
         appStatsQueryThread = new AppStatsQueryThread(context);
         appStatsQueryThread.run();
+        //odotellaan, että thread on valmis
+        try {
+            appStatsQueryThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     //Metodi, joka alustaa käyttöön SwipeRefreshin
@@ -84,6 +86,17 @@ public class MainActivity extends FragmentActivity{
 
                         //Ajetaan Threadin runnable uudelleen
                         appStatsQueryThread.run();
+
+                        //Odotellaan, että THREAD on valmis
+                        try {
+                            appStatsQueryThread.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        top5AppsFragment.getStats();
+                        top5AppsFragment.setIconDrawable();
+                        top5AppsFragment.setTextViewTexts();
 
                         swipeLayout.setRefreshing(false);
                         String toastRefreshningReady = getResources().getString(R.string.refreshing_ready);
@@ -148,14 +161,16 @@ public class MainActivity extends FragmentActivity{
         }
     }
 
+    //TODO: muistinhallinta
     @Override
     protected void onDestroy()
     {
-
         super.onDestroy();
-        //finish();
-        //detachFragment(lastTimeUsedFragment);
-        //detachFragment(top5AppsFragment);
+
+        finish();
+        appStatsQueryThread.interrupt();
+
+
     }
 
     private void checkDisplayStats()

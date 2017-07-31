@@ -26,6 +26,7 @@ public class AppStatsManager extends AppCompatActivity {
 
     AppStatsManager(Context context)
     { mContext = context; }
+
     //Metodi, jolla paketin nimen avulla voi hakea applikaation labelin
     public String getAppLabel(String packageName, Context context)
     {
