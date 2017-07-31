@@ -94,14 +94,15 @@ class AppStatsQueryThread extends Thread{
                     Calendar cal1 = Calendar.getInstance();
                     cal1.set(Calendar.HOUR_OF_DAY, 0);
                     cal1.set(Calendar.MINUTE, 0);
-                    cal1.set(Calendar.SECOND, 1);
+                    cal1.set(Calendar.SECOND, 0);
                     cal1.set(Calendar.MILLISECOND, 0);
 
                     begin = cal1.getTimeInMillis();
                     //Lisätään yksi päivä ja otetaan ylös millisekunteina
-                    cal1.add(Calendar.DAY_OF_YEAR, 1);
-                    //Lisätään sekunti, jotta ohjelma saa hieman pelivaraa lagien varalta
-                    cal1.set(Calendar.SECOND, 0);
+                    cal1.set(Calendar.HOUR_OF_DAY, 23);
+                    cal1.set(Calendar.MINUTE, 59);
+                    cal1.set(Calendar.SECOND, 59);
+                    cal1.set(Calendar.MILLISECOND, 99);
                     end = cal1.getTimeInMillis();
                 }
 
@@ -119,12 +120,18 @@ class AppStatsQueryThread extends Thread{
                     int dayOfWeek = cal1.get(Calendar.DAY_OF_WEEK);
                     Log.d("DOW", String.valueOf(dayOfWeek));
 
-                    end = cal1.getTimeInMillis();
+                    if(cal1.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY)
+                    {
+                        cal1.add(Calendar.DAY_OF_WEEK, 1);
+                        end = cal1.getTimeInMillis();
+                    }
 
-                    //cal1.add(Calendar.DAY_OF_WEEK, -dayOfWeek);
-                    //cal1.set(Calendar.DAY_OF_WEEK, 0);
+                    else
+                    {
+                        end = cal1.getTimeInMillis();
+                    }
 
-                    //cal1.set(Calendar.DAY_OF_WEEK, Calendar.getInstance().getFirstDayOfWeek());
+
                     cal1.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY); //TODO: tee tähän asetus, jolla voi valita aloitusviikonpäivän
 
                     begin = cal1.getTimeInMillis();
@@ -133,31 +140,41 @@ class AppStatsQueryThread extends Thread{
                 if(querySelection.equals(mContext.getResources().getString(R.string.monthly_text)))
                 {
                     Calendar cal1 = Calendar.getInstance();
-                    cal1.set(Calendar.HOUR_OF_DAY, 0);
-                    cal1.set(Calendar.MINUTE, 0);
-                    cal1.set(Calendar.SECOND, 0);
-                    cal1.set(Calendar.MILLISECOND, 0);
+                    cal1.set(Calendar.HOUR_OF_DAY, 23);
+                    cal1.set(Calendar.MINUTE, 59);
+                    cal1.set(Calendar.SECOND, 59);
+                    cal1.set(Calendar.MILLISECOND, 99);
 
                     int currentDOM = cal1.get(Calendar.DAY_OF_MONTH);
                     Log.d("DOM", String.valueOf(currentDOM));
                     end = cal1.getTimeInMillis();
 
+                    cal1.set(Calendar.HOUR_OF_DAY, 0);
+                    cal1.set(Calendar.MINUTE, 0);
+                    cal1.set(Calendar.SECOND, 0);
+                    cal1.set(Calendar.MILLISECOND, 0);
                     cal1.set(Calendar.DAY_OF_MONTH, 1);
 
                     begin = cal1.getTimeInMillis();
                 }
 
+                //YEARLY
                 if(querySelection.equals(mContext.getResources().getString(R.string.yearly_text)))
                 {
                     Calendar cal1 = Calendar.getInstance();
-                    cal1.set(Calendar.HOUR_OF_DAY, 0);
-                    cal1.set(Calendar.MINUTE, 0);
-                    cal1.set(Calendar.SECOND, 0);
-                    cal1.set(Calendar.MILLISECOND, 0);
+                    cal1.set(Calendar.HOUR_OF_DAY, 23);
+                    cal1.set(Calendar.MINUTE, 59);
+                    cal1.set(Calendar.SECOND, 59);
+                    cal1.set(Calendar.MILLISECOND, 99);
 
                     int currentDOY = cal1.get(Calendar.DAY_OF_YEAR);
                     Log.d("DOY", String.valueOf(currentDOY));
                     end = cal1.getTimeInMillis();
+
+                    cal1.set(Calendar.HOUR_OF_DAY, 0);
+                    cal1.set(Calendar.MINUTE, 0);
+                    cal1.set(Calendar.SECOND, 0);
+                    cal1.set(Calendar.MILLISECOND, 0);
 
                     cal1.set(Calendar.MONTH, 1);
                     cal1.set(Calendar.DAY_OF_MONTH, 1);
@@ -198,7 +215,6 @@ class AppStatsQueryThread extends Thread{
                         //Tarkastaa TOP5 käytetyimmät appsit
                         checkMostUsed(aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()),lUsageStats.getPackageName(), lUsageStats.getTotalTimeInForeground());
 
-                        //TODO:
                         //Tarkastaa yhteensä appsien käyttämän ajan
                         calculateTotalTime(lUsageStats.getTotalTimeInForeground(), aStatsManager.getAppLabel(lUsageStats.getPackageName(), mContext.getApplicationContext()));
                     }
@@ -308,8 +324,30 @@ class AppStatsQueryThread extends Thread{
         totalUsageTimeMillis = totalUsageTimeMillis + usageTime;
         totalUsageTimeMinutes = timeConverter.convertMillisToMinutes(totalUsageTimeMillis);
 
+        //DAILY
+        if(getSharedPreferences("spinnerselection", "top5appsfragment").equals(mContext.getResources().getString(R.string.daily_text)))
+        {
+            totalUsageStringBuilder.append(mContext.getResources().getString(R.string.totalusage_text_daily)).append("\r\n").append(timeConverter.convertMillisToHoursMinutesSeconds(totalUsageTimeMillis));
+        }
 
-        totalUsageStringBuilder.append(mContext.getResources().getString(R.string.totalusage_text)).append("\r\n").append(timeConverter.convertMillisToHoursMinutesSeconds(totalUsageTimeMillis));
+        //WEEKLY
+        if(getSharedPreferences("spinnerselection", "top5appsfragment").equals(mContext.getResources().getString(R.string.weekly_text)))
+        {
+            totalUsageStringBuilder.append(mContext.getResources().getString(R.string.totalusage_text_weekly)).append("\r\n").append(timeConverter.convertMillisToHoursMinutesSeconds(totalUsageTimeMillis));
+        }
+
+        //MONTHLY
+        if(getSharedPreferences("spinnerselection", "top5appsfragment").equals(mContext.getResources().getString(R.string.monthly_text)))
+        {
+            totalUsageStringBuilder.append(mContext.getResources().getString(R.string.totalusage_text_monthly)).append("\r\n").append(timeConverter.convertMillisToHoursMinutesSeconds(totalUsageTimeMillis));
+        }
+
+        //YEARLY
+        if(getSharedPreferences("spinnerselection", "top5appsfragment").equals(mContext.getResources().getString(R.string.yearly_text)))
+        {
+            totalUsageStringBuilder.append(mContext.getResources().getString(R.string.totalusage_text_yearly)).append("\r\n").append(timeConverter.convertMillisToHoursMinutesSeconds(totalUsageTimeMillis));
+        }
+
         totalUsage = totalUsageStringBuilder.toString();
 
         return totalUsage;
@@ -407,7 +445,7 @@ class AppStatsQueryThread extends Thread{
         StringBuilder top5StringBuilder = new StringBuilder();
 
         //Jos käyttöaika on isompi kuin top1Millis
-        if(usageTime > top1Millis)
+        if(usageTime > top1Millis && !appName.contains("launcher") && !appName.contains("Launcher"))
         {
             top5Millis = top4Millis;
             top4Millis = top3Millis;
@@ -433,7 +471,7 @@ class AppStatsQueryThread extends Thread{
         }
 
         //Jos käyttöaika on isompi kuin top2Millis, mutta pienempi kuin top1Millis
-        else if(usageTime > top2Millis && usageTime < top1Millis)
+        else if(usageTime > top2Millis && usageTime < top1Millis && !appName.contains("launcher") && !appName.contains("Launcher"))
         {
             top5Millis = top4Millis;
             top4Millis = top3Millis;
@@ -456,7 +494,7 @@ class AppStatsQueryThread extends Thread{
         }
 
         //Jos käyttöaika on isompi kuin top3Millis, mutta pienempi kuin top2Millis
-        else if(usageTime > top3Millis && usageTime < top2Millis)
+        else if(usageTime > top3Millis && usageTime < top2Millis && !appName.contains("launcher") && !appName.contains("Launcher"))
         {
             top5Millis = top4Millis;
             top4Millis = top3Millis;
@@ -476,7 +514,7 @@ class AppStatsQueryThread extends Thread{
         }
 
         //Jos käyttöaika on isompi kuin top4Millis, mutta pienempi kuin top3Millis
-        else if(usageTime > top4Millis && usageTime < top3Millis)
+        else if(usageTime > top4Millis && usageTime < top3Millis && !appName.contains("launcher") && !appName.contains("Launcher"))
         {
             top5Millis = top4Millis;
             top4Millis = usageTime;
@@ -493,7 +531,7 @@ class AppStatsQueryThread extends Thread{
         }
 
         //jos käyttöaika on isompi kuin top4Millis, mutta pienempi kuin top4Millis
-        else if(usageTime > top5Millis && usageTime < top4Millis)
+        else if(usageTime > top5Millis && usageTime < top4Millis && !appName.contains("launcher") && !appName.contains("Launcher"))
         {
             top5Millis = usageTime;
 
@@ -546,7 +584,7 @@ class AppStatsQueryThread extends Thread{
         }
 
         //Varmistetaan ettei tämä appi tule listalle
-        if(lastTimeUsed > top1 && !Objects.equals(packageName, mContext.getApplicationContext().getPackageName()) && !appName.contains("launcher"))
+        if(lastTimeUsed > top1 && !Objects.equals(packageName, mContext.getApplicationContext().getPackageName()) && !appName.contains("launcher") && !appName.contains("Launcher"))
         {
             top5 = top4;
             top4 = top3;
