@@ -44,7 +44,7 @@ class AppStatsQueryThread extends Thread{
     //Kokonaiskäyttöaika
     private String totalUsage = null;
 
-     private AppStatsManager aStatsManager;
+    private AppStatsManager aStatsManager;
     private Converter timeConverter = new Converter();
 
     private int counter = 0;
@@ -101,8 +101,8 @@ class AppStatsQueryThread extends Thread{
                     //Lisätään yksi päivä ja otetaan ylös millisekunteina
                     cal1.set(Calendar.HOUR_OF_DAY, 23);
                     cal1.set(Calendar.MINUTE, 59);
-                    cal1.set(Calendar.SECOND, 59);
-                    cal1.set(Calendar.MILLISECOND, 99);
+                    //cal1.set(Calendar.SECOND, 59);
+                    //cal1.set(Calendar.MILLISECOND, 99);
                     end = cal1.getTimeInMillis();
                 }
 
@@ -167,6 +167,9 @@ class AppStatsQueryThread extends Thread{
                     cal1.set(Calendar.SECOND, 59);
                     cal1.set(Calendar.MILLISECOND, 99);
 
+                    cal1.set(Calendar.MONTH, Calendar.DECEMBER);
+                    cal1.set(Calendar.DAY_OF_MONTH, 30);
+
                     int currentDOY = cal1.get(Calendar.DAY_OF_YEAR);
                     Log.d("DOY", String.valueOf(currentDOY));
                     end = cal1.getTimeInMillis();
@@ -176,7 +179,7 @@ class AppStatsQueryThread extends Thread{
                     cal1.set(Calendar.SECOND, 0);
                     cal1.set(Calendar.MILLISECOND, 0);
 
-                    cal1.set(Calendar.MONTH, 1);
+                    cal1.set(Calendar.MONTH, Calendar.JANUARY);
                     cal1.set(Calendar.DAY_OF_MONTH, 1);
 
                     begin = cal1.getTimeInMillis();
@@ -358,6 +361,9 @@ class AppStatsQueryThread extends Thread{
         //usageStatsUsageTimeApps = null;
         //listUsageTimeApps = null;
         //lUsageStatsList = null;
+
+        listUsageTimeApps = null;
+        lUsageStatsList = null;
 
         //Nollataan viimeksi käytetty aika
         top1 = 0;

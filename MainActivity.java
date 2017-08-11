@@ -25,7 +25,11 @@ public class MainActivity extends FragmentActivity{
 
     Top5AppsFragment top5AppsFragment;
     LastTimeUsedFragment lastTimeUsedFragment;
+    WeeklyBarDiagramFragment weeklyBarDiagramFragment;
+
+
     Thread appStatsQueryThread;
+    Thread appStatsWeeklyQueryThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,7 @@ public class MainActivity extends FragmentActivity{
 
         top5AppsFragment = new Top5AppsFragment();
         lastTimeUsedFragment = new LastTimeUsedFragment();
+        weeklyBarDiagramFragment = new WeeklyBarDiagramFragment();
 
         //Alustaa liukupäivityksen käyttöön
         initializeSwipeRefresh();
@@ -61,6 +66,8 @@ public class MainActivity extends FragmentActivity{
     {
         Context context = this.getApplicationContext();
         appStatsQueryThread = new AppStatsQueryThread(context);
+        appStatsWeeklyQueryThread = new AppStatsWeeklyQueryThread(context);
+        appStatsWeeklyQueryThread.run();
         appStatsQueryThread.run();
         //odotellaan, että thread on valmis
         try {
@@ -92,6 +99,7 @@ public class MainActivity extends FragmentActivity{
                             appStatsQueryThread.join();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                            Log.d("Threadin odottaminen", "ei onnistunut");
                         }
 
                         top5AppsFragment.getStats();
@@ -114,7 +122,7 @@ public class MainActivity extends FragmentActivity{
     }
 
     private class MyPagerAdapter extends FragmentPagerAdapter {
-        private  int NUM_ITEMS = 2;
+        private  int NUM_ITEMS = 3;
 
         MyPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
@@ -138,7 +146,8 @@ public class MainActivity extends FragmentActivity{
                     return lastTimeUsedFragment;
                 case 2: // Fragment # 1 - This will show SecondFragment
                     //return top5AppsFragment;
-                    return null;
+                    //return null;
+                    return weeklyBarDiagramFragment;
                 default:
                     return null;
             }
@@ -154,7 +163,7 @@ public class MainActivity extends FragmentActivity{
                 case 1:
                     return getResources().getString(R.string.lastusedpage_title);
                 case 2: 
-                    return getResources().getString(R.string.top5appspage_title);
+                    return "Weekly Diagram";
                 default:
                     return "Page" + position;
             }
@@ -169,8 +178,6 @@ public class MainActivity extends FragmentActivity{
 
         finish();
         appStatsQueryThread.interrupt();
-
-
     }
 
     private void checkDisplayStats()
