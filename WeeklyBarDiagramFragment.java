@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.ValueDependentColor;
@@ -20,6 +21,8 @@ public class WeeklyBarDiagramFragment extends Fragment {
 
     View view;
     GraphView graph;
+
+    TextView textViewAvgUsage;
 
     String mondayStr;
     String tuesdayStr;
@@ -56,6 +59,7 @@ public class WeeklyBarDiagramFragment extends Fragment {
     protected void initializeBarDiagram()
     {
         graph = (GraphView) view.findViewById(R.id.graph);
+        textViewAvgUsage = (TextView) view.findViewById(R.id.textViewAvgUsage);
     }
 
     protected void getBarDiagramData()
@@ -102,12 +106,18 @@ public class WeeklyBarDiagramFragment extends Fragment {
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
         staticLabelsFormatter.setHorizontalLabels(new String[] {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"});
 
+
+        //Kirjoittaa arvot palkkien päälle
+        series.setDrawValuesOnTop(true);
+        series.setValuesOnTopColor(Color.WHITE);
+
+        //staticLabelsFormatter.setVerticalLabels(new String[] {"", ""});
         graph.setTitle("Usage stats are described in minutes"); //TODO: tähän stringi
 
         graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
 
 
-        // styling
+
         series.setValueDependentColor(new ValueDependentColor<DataPoint>() {
             @Override
             public int get(DataPoint data) {
@@ -125,17 +135,18 @@ public class WeeklyBarDiagramFragment extends Fragment {
             }
         });
 
-        series.setSpacing(50);
+        series.setSpacing(75);
 
-        //Kirjoittaa arvot palkkien päälle
-        series.setDrawValuesOnTop(true);
-        series.setValuesOnTopColor(Color.WHITE);
-
-        graph.setTitle("min");
-        graph.setTitleColor(Color.RED);
-
+        //Asettaa automaattisen animoinnin päälle
+        series.setAnimated(true);
+        //graph.setTitle("min");
+        graph.setTitleColor(Color.WHITE);
 
         graph.addSeries(series);
+
+        String str = String.valueOf(avgUsage);
+
+        textViewAvgUsage.setText(getResources().getString(R.string.avgtime_thisweek)+ " " + str + " min");
     }
 
     //Metodi, jolla voi hakea jaetun String -muuttujan

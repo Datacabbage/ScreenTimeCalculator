@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -91,30 +92,41 @@ class AppStatsQueryThread extends Thread{
                 Log.d("query", querySelection);
                 if(querySelection.equals(mContext.getResources().getString(R.string.daily_text)))
                 {
-                    Calendar cal1 = Calendar.getInstance();
+
+                    //timezone "UTC" toimii ainoastaan jos käytössä on GMT + 0
+                    //Calendar cal1 = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                    Calendar cal1 = Calendar.getInstance(TimeZone.getTimeZone("GMT+3"));
+                    //Calendar cal1 = Calendar.getInstance();
+                    Log.d("Cal,instance", String.valueOf(cal1.getTimeInMillis()));
                     cal1.set(Calendar.HOUR_OF_DAY, 0);
                     cal1.set(Calendar.MINUTE, 0);
-                    cal1.set(Calendar.SECOND, 0);
-                    cal1.set(Calendar.MILLISECOND, 0);
+                    //cal1.set(Calendar.SECOND, 0);
+                    //cal1.set(Calendar.MILLISECOND, 0);
 
                     begin = cal1.getTimeInMillis();
                     //Lisätään yksi päivä ja otetaan ylös millisekunteina
-                    cal1.set(Calendar.HOUR_OF_DAY, 23);
-                    cal1.set(Calendar.MINUTE, 59);
+                    cal1 = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                    //cal1.set(Calendar.HOUR_OF_DAY, 23);
+                    //cal1.set(Calendar.MINUTE, 59);
                     //cal1.set(Calendar.SECOND, 59);
                     //cal1.set(Calendar.MILLISECOND, 99);
-                    end = cal1.getTimeInMillis();
+                    //end = cal1.getTimeInMillis();
+                    end = System.currentTimeMillis();
                 }
 
+                //Ongelmallinen hakumetodi viikottainen, koska jenkeissä viikko alkaa sunnuntaista ja lopppuu lauantaihin (palauttaa siis SUN - SAT
                 if(querySelection.equals(mContext.getResources().getString(R.string.weekly_text)))
                 {
-                    Calendar cal1 = Calendar.getInstance();
+                    Calendar cal1 = Calendar.getInstance(TimeZone.getTimeZone("GMT+3"));
 
                     cal1.set(Calendar.HOUR_OF_DAY, 0);
                     cal1.set(Calendar.MINUTE, 0);
                     cal1.set(Calendar.SECOND, 0);
                     cal1.set(Calendar.MILLISECOND, 0);
 
+                    end = cal1.getTimeInMillis();
+
+                    /*
                     Log.d("getFirstDayOfWeek", String.valueOf(Calendar.getInstance().getFirstDayOfWeek()));
                     
                     int dayOfWeek = cal1.get(Calendar.DAY_OF_WEEK);
@@ -134,12 +146,14 @@ class AppStatsQueryThread extends Thread{
 
                     cal1.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY); //TODO: tee tähän asetus, jolla voi valita aloitusviikonpäivän
 
+*/
+                    cal1.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
                     begin = cal1.getTimeInMillis();
                 }
 
                 if(querySelection.equals(mContext.getResources().getString(R.string.monthly_text)))
                 {
-                    Calendar cal1 = Calendar.getInstance();
+                    Calendar cal1 = Calendar.getInstance(TimeZone.getTimeZone("GMT+3"));
                     cal1.set(Calendar.HOUR_OF_DAY, 23);
                     cal1.set(Calendar.MINUTE, 59);
                     cal1.set(Calendar.SECOND, 59);
@@ -161,7 +175,7 @@ class AppStatsQueryThread extends Thread{
                 //YEARLY
                 if(querySelection.equals(mContext.getResources().getString(R.string.yearly_text)))
                 {
-                    Calendar cal1 = Calendar.getInstance();
+                    Calendar cal1 = Calendar.getInstance(TimeZone.getTimeZone("GMT+3"));
                     cal1.set(Calendar.HOUR_OF_DAY, 23);
                     cal1.set(Calendar.MINUTE, 59);
                     cal1.set(Calendar.SECOND, 59);

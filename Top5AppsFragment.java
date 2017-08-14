@@ -365,6 +365,11 @@ public class Top5AppsFragment extends Fragment implements AdapterView.OnItemSele
         // On selecting a spinner item
         item = parent.getItemAtPosition(position).toString();
 
+        if(item.equals(getResources().getString(R.string.weekly_text)))
+        {
+            Toast.makeText(parent.getContext(), "Weekly returns data from sun to sat", Toast.LENGTH_SHORT).show();
+        }
+
         setSharedPreference("spinnerselection", "top5appsfragment", item);
 
         //Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_SHORT).show(); //TODO: tee tähän tarvittava stringi

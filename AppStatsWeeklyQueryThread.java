@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -119,7 +120,7 @@ public class AppStatsWeeklyQueryThread extends Thread{
 
         totalUsageTime = 0;
 
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
@@ -163,7 +164,7 @@ public class AppStatsWeeklyQueryThread extends Thread{
 
         usageStatsForOneWeekday.clear();
 
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
@@ -373,7 +374,7 @@ public class AppStatsWeeklyQueryThread extends Thread{
 
         usageStatsForOneWeekday.clear();
 
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
@@ -405,5 +406,4 @@ public class AppStatsWeeklyQueryThread extends Thread{
         }
         Log.d("Sunday", String.valueOf(totalUsageSunday));
     }
-
 }
